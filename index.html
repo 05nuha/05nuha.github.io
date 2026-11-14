@@ -1,0 +1,702 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>nuha aburamadan — ai security</title>
+<meta name="description" content="Final-year cybersecurity student in Dubai building AI security tooling — LLM guardrails, risk-framework mapping, content forensics.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌸</text></svg>">
+<style>
+:root{
+  --bg:#0b0710;
+  --bg2:#120b1a;
+  --panel:#160e20;
+  --line:rgba(255,139,184,.14);
+  --line2:rgba(255,139,184,.3);
+  --pink:#ff8bb8;
+  --pink-hi:#ffb3d1;
+  --pink-dim:#b86a8e;
+  --lav:#c9a6ff;
+  --mint:#9ef0d2;
+  --txt:#f3e9f0;
+  --dim:#9d8ba0;
+  --mono:'JetBrains Mono',ui-monospace,monospace;
+  --serif:'Fraunces',serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--txt);font-family:var(--mono);
+  font-size:15px;line-height:1.7;overflow-x:hidden;
+}
+::selection{background:var(--pink);color:#1a0a12}
+
+/* background texture */
+body::before{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:
+    radial-gradient(ellipse 60% 45% at 75% -5%, rgba(255,139,184,.13), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 10% 100%, rgba(201,166,255,.09), transparent 60%);
+}
+body::after{
+  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
+  background-image:
+    linear-gradient(rgba(255,139,184,.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,139,184,.03) 1px, transparent 1px);
+  background-size:44px 44px;
+  mask-image:radial-gradient(ellipse 80% 70% at 50% 20%, #000 20%, transparent 80%);
+}
+.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 24px}
+
+/* nav */
+nav{
+  position:sticky;top:0;z-index:10;backdrop-filter:blur(14px);
+  background:rgba(11,7,16,.72);border-bottom:1px solid var(--line);
+}
+.nav-in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
+.logo{color:var(--pink);font-weight:700;text-decoration:none;letter-spacing:.04em}
+.logo .tld{color:var(--dim);font-weight:300}
+.nav-links{margin-left:auto;display:flex;gap:22px}
+.nav-links a{color:var(--dim);text-decoration:none;font-size:13px;transition:color .2s}
+.nav-links a:hover{color:var(--pink-hi)}
+.nav-links a::before{content:"./";color:var(--pink-dim);opacity:0;transition:opacity .2s}
+.nav-links a:hover::before{opacity:1}
+
+/* hero */
+header{padding:110px 0 70px}
+.prompt-line{color:var(--dim);font-size:13px;margin-bottom:18px}
+.prompt-line .u{color:var(--mint)}
+.prompt-line .p{color:var(--lav)}
+h1{
+  font-size:clamp(34px,6vw,62px);font-weight:500;letter-spacing:-.02em;line-height:1.12;
+  margin-bottom:8px;
+}
+h1 .accent{
+  font-family:var(--serif);font-style:italic;font-weight:300;color:var(--pink);
+  text-shadow:0 0 28px rgba(255,139,184,.45);
+}
+.typed-wrap{min-height:32px;margin:14px 0 26px;font-size:clamp(15px,2.4vw,19px);color:var(--dim)}
+.typed::after{content:"▌";color:var(--pink);animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.hero-tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px}
+.tag{
+  font-size:12px;padding:5px 12px;border:1px solid var(--line2);border-radius:999px;
+  color:var(--pink-hi);background:rgba(255,139,184,.06);
+}
+.cta-row{display:flex;gap:14px;flex-wrap:wrap}
+.btn{
+  display:inline-block;padding:11px 22px;border-radius:8px;text-decoration:none;
+  font-size:13.5px;font-weight:500;letter-spacing:.02em;transition:all .22s;
+}
+.btn-solid{background:var(--pink);color:#23060f;box-shadow:0 0 24px rgba(255,139,184,.35)}
+.btn-solid:hover{background:var(--pink-hi);box-shadow:0 0 38px rgba(255,139,184,.55);transform:translateY(-1px)}
+.btn-ghost{border:1px solid var(--line2);color:var(--pink-hi)}
+.btn-ghost:hover{background:rgba(255,139,184,.08);border-color:var(--pink)}
+
+/* sections */
+section{padding:64px 0}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:34px}
+.sec-head h2{font-size:21px;font-weight:500;letter-spacing:.01em;white-space:nowrap}
+.sec-head h2 .hash{color:var(--pink);margin-right:6px}
+.sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line2),transparent)}
+.sec-head .num{font-size:12px;color:var(--pink-dim)}
+
+/* terminal card (about) */
+.term{
+  border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--panel);
+  box-shadow:0 18px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,139,184,.04), 0 0 46px rgba(255,139,184,.07);
+}
+.term-bar{
+  display:flex;align-items:center;gap:8px;padding:11px 16px;
+  background:rgba(255,139,184,.06);border-bottom:1px solid var(--line);
+}
+.dot{width:11px;height:11px;border-radius:50%}
+.d1{background:#ff7aa8}.d2{background:#ffc2d9}.d3{background:#c9a6ff}
+.term-title{margin-left:8px;font-size:12px;color:var(--dim)}
+.term-body{padding:26px 26px 30px;font-size:14px}
+.term-body .ln{display:block;margin-bottom:4px}
+.term-body .cm{color:var(--pink-dim);font-style:italic}
+.term-body .k{color:var(--lav)}
+.term-body .s{color:var(--mint)}
+.term-body p{color:var(--txt);margin:14px 0;max-width:62ch}
+.term-body p b{color:var(--pink-hi);font-weight:500}
+
+/* guardrail game */
+.game{
+  border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:#140c1d;
+  box-shadow:0 18px 60px rgba(0,0,0,.45), 0 0 46px rgba(255,139,184,.07);
+}
+.game-chat{padding:20px 22px;height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:82%;padding:10px 15px;border-radius:12px;font-size:13.5px;line-height:1.6;white-space:pre-wrap}
+.msg.bot{align-self:flex-start;background:rgba(255,139,184,.08);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.bot .det{display:block;margin-top:6px;font-size:11px;color:var(--lav);letter-spacing:.04em}
+.msg.user{align-self:flex-end;background:rgba(201,166,255,.1);border:1px solid rgba(201,166,255,.2);border-bottom-right-radius:4px;color:var(--txt)}
+.msg.win{background:rgba(158,240,210,.08);border-color:rgba(158,240,210,.35)}
+.msg.win .flag{color:var(--mint);font-weight:700;letter-spacing:.03em}
+.game-in{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+.game-in input{
+  flex:1;background:rgba(255,139,184,.04);border:1px solid var(--line);border-radius:8px;
+  padding:10px 14px;color:var(--txt);font-family:var(--mono);font-size:13.5px;outline:none;
+  caret-color:var(--pink);transition:border-color .2s;
+}
+.game-in input:focus{border-color:var(--line2)}
+.game-in button{
+  padding:10px 20px;border:none;border-radius:8px;background:var(--pink);color:#23060f;
+  font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
+}
+.game-in button:hover{background:var(--pink-hi);box-shadow:0 0 18px rgba(255,139,184,.4)}
+.game-note{font-size:12px;color:var(--dim);margin-top:14px}
+.game-note b{color:var(--pink-dim);font-weight:500}
+
+/* projects */
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+.card{
+  position:relative;border:1px solid var(--line);border-radius:12px;padding:24px;
+  background:linear-gradient(160deg, rgba(255,139,184,.045), rgba(22,14,32,.6) 45%);
+  text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;
+  transition:transform .25s, border-color .25s, box-shadow .25s;
+}
+.card:hover{
+  transform:translateY(-4px);border-color:var(--line2);
+  box-shadow:0 16px 44px rgba(0,0,0,.5), 0 0 34px rgba(255,139,184,.14);
+}
+.card-top{display:flex;align-items:center;gap:10px}
+.card-top .ico{font-size:18px}
+.card h3{font-size:16px;font-weight:600;color:var(--pink-hi)}
+.card .win{
+  margin-left:auto;font-size:10.5px;letter-spacing:.06em;padding:3px 9px;border-radius:999px;
+  background:rgba(158,240,210,.1);color:var(--mint);border:1px solid rgba(158,240,210,.25);
+  white-space:nowrap;
+}
+.card p{font-size:13.5px;color:var(--dim);flex:1}
+.card p b{color:var(--txt);font-weight:500}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-size:11px;color:var(--lav);background:rgba(201,166,255,.08);
+  border:1px solid rgba(201,166,255,.18);padding:2.5px 9px;border-radius:5px}
+.card .go{font-size:12px;color:var(--pink);opacity:0;transform:translateX(-4px);transition:all .25s}
+.card:hover .go{opacity:1;transform:none}
+.card.wide{grid-column:1/-1}
+
+/* timeline (research & wins) */
+.tl{border-left:1px solid var(--line2);margin-left:6px;padding-left:28px;display:flex;flex-direction:column;gap:30px}
+.tl-item{position:relative}
+.tl-item::before{
+  content:"";position:absolute;left:-33.5px;top:7px;width:10px;height:10px;border-radius:50%;
+  background:var(--bg);border:2px solid var(--pink);box-shadow:0 0 12px rgba(255,139,184,.6);
+}
+.tl-item .when{font-size:11.5px;color:var(--pink-dim);letter-spacing:.08em;text-transform:uppercase}
+.tl-item.hot{border:1px solid var(--line2);border-radius:12px;padding:18px 20px;margin-left:-20px;
+  background:linear-gradient(160deg, rgba(255,139,184,.07), transparent 55%);
+  box-shadow:0 0 30px rgba(255,139,184,.08)}
+.tl-item.hot::before{left:-53.5px;top:25px}
+.tl-item h3{font-size:16px;font-weight:600;margin:4px 0 6px}
+.tl-item h3 a{color:var(--pink-hi);text-decoration:none;border-bottom:1px dashed var(--line2)}
+.tl-item h3 a:hover{color:var(--pink)}
+.tl-item p{color:var(--dim);font-size:13.5px;max-width:68ch}
+
+/* skills */
+.skills{display:flex;flex-direction:column;gap:14px}
+.skill-row{
+  display:flex;gap:18px;align-items:baseline;border:1px solid var(--line);border-radius:12px;
+  padding:16px 20px;background:var(--panel);flex-wrap:wrap;
+}
+.skill-row .lbl{
+  min-width:130px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);
+  font-weight:600;
+}
+.skill-row .set{display:flex;flex-wrap:wrap;gap:8px;flex:1}
+.skill-row .set span{
+  font-size:12.5px;padding:4px 12px;border-radius:999px;color:var(--txt);
+  background:rgba(255,139,184,.06);border:1px solid var(--line);
+  transition:border-color .2s, background .2s;
+}
+.skill-row .set span:hover{border-color:var(--pink);background:rgba(255,139,184,.13)}
+.skill-row .set span.hot{color:var(--pink-hi);border-color:var(--line2);font-weight:500}
+
+/* certs */
+.cert-row{display:flex;gap:16px;flex-wrap:wrap}
+.cert{
+  flex:1;min-width:230px;border:1px solid var(--line);border-radius:12px;padding:20px 22px;
+  background:var(--panel);display:flex;gap:14px;align-items:center;
+}
+.cert .glyph{
+  width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:19px;
+  background:rgba(255,139,184,.1);border:1px solid var(--line2);
+}
+.cert b{display:block;font-size:14.5px;font-weight:600;color:var(--txt)}
+.cert span{font-size:12px;color:var(--dim)}
+
+/* contact */
+.contact{
+  text-align:center;padding:72px 0 40px;
+}
+.contact h2{font-size:clamp(26px,4.5vw,40px);font-weight:500;margin-bottom:10px}
+.contact h2 em{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--pink);
+  text-shadow:0 0 26px rgba(255,139,184,.4)}
+.contact p{color:var(--dim);margin-bottom:28px}
+.contact .cta-row{justify-content:center}
+footer{
+  border-top:1px solid var(--line);padding:22px 0 30px;text-align:center;
+  color:var(--dim);font-size:12px;
+}
+footer .heart{color:var(--pink)}
+
+/* interactive terminal */
+#term-fab{
+  position:fixed;right:22px;bottom:22px;z-index:20;cursor:pointer;
+  font-family:var(--mono);font-size:13px;padding:11px 18px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--line2);color:var(--pink-hi);
+  box-shadow:0 8px 30px rgba(0,0,0,.5), 0 0 22px rgba(255,139,184,.18);
+  transition:all .22s;
+}
+#term-fab:hover{background:rgba(255,139,184,.12);transform:translateY(-2px)}
+#term-overlay{
+  position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
+  background:rgba(11,7,16,.72);backdrop-filter:blur(6px);padding:20px;
+}
+#term-overlay.open{display:flex}
+.iterm{
+  width:min(640px,100%);max-height:72vh;display:flex;flex-direction:column;
+  border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:#140c1d;
+  box-shadow:0 30px 90px rgba(0,0,0,.7), 0 0 60px rgba(255,139,184,.14);
+  animation:termin .22s ease;
+}
+@keyframes termin{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.iterm-out{padding:18px 20px;overflow-y:auto;font-size:13.5px;flex:1;min-height:200px}
+.iterm-out .o-cmd{color:var(--mint)}
+.iterm-out .o-cmd::before{content:"nuha@dxb:~$ ";color:var(--pink-dim)}
+.iterm-out .o-res{color:var(--txt);white-space:pre-wrap;margin:4px 0 14px}
+.iterm-out .o-res a{color:var(--pink);text-decoration:underline dashed}
+.iterm-out .o-res .hl{color:var(--pink-hi)}
+.iterm-in{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid var(--line)}
+.iterm-in .ps1{color:var(--pink-dim);font-size:13.5px;white-space:nowrap}
+.iterm-in input{
+  flex:1;background:none;border:none;outline:none;color:var(--mint);
+  font-family:var(--mono);font-size:13.5px;caret-color:var(--pink);
+}
+/* card tilt */
+.card{will-change:transform}
+@media (prefers-reduced-motion:reduce){
+  .rv{transition:none}
+  .typed::after{animation:none}
+}
+/* reveal on scroll */
+.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+.rv.in{opacity:1;transform:none}
+
+@media (max-width:640px){
+  header{padding:70px 0 50px}
+  .nav-links{gap:14px}
+  .nav-links a::before{display:none}
+}
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="nav-in">
+    <a class="logo" href="#">nuha<span class="tld">.sec</span></a>
+    <div class="nav-links">
+      <a href="#about">about</a>
+      <a href="#projects">projects</a>
+      <a href="#research">research</a>
+      <a href="#contact">contact</a>
+    </div>
+  </div>
+</nav>
+
+<header class="wrap">
+  <div class="prompt-line"><span class="u">nuha@dxb</span>:<span class="p">~</span>$ whoami</div>
+  <h1>securing <span class="accent">ai systems,</span><br>one prompt at a time</h1>
+  <div class="typed-wrap"><span class="typed" id="typed"></span></div>
+  <div class="hero-tags">
+    <span class="tag">🌸 ai security</span>
+    <span class="tag">llm guardrails</span>
+    <span class="tag">mitre atlas · owasp llm</span>
+    <span class="tag">📍 dubai</span>
+  </div>
+  <div class="cta-row">
+    <a class="btn btn-solid" href="#projects">see my work ↓</a>
+    <a class="btn btn-ghost" href="https://github.com/05nuha" target="_blank" rel="noopener">github</a>
+    <a class="btn btn-ghost" href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener">linkedin</a>
+  </div>
+</header>
+
+<section id="about" class="wrap">
+  <div class="sec-head rv"><h2><span class="hash">#</span>about</h2><div class="rule"></div><span class="num">01</span></div>
+  <div class="term rv">
+    <div class="term-bar">
+      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <span class="term-title">nuha@dxb: ~/about — cat readme.md</span>
+    </div>
+    <div class="term-body">
+      <span class="ln cm"># final-year cybersecurity student @ canadian university dubai · gpa 3.8/4.0</span>
+      <p>i work on the <b>security of llm systems</b>: built a prompt-injection &amp; hallucination classifier at <b>qcri</b>, an open-source llm risk-assessment pipeline, and co-authored research showing clean-benchmark accuracy overstates the robustness of ml security systems. currently an <b>ai security consultant intern at cpx (g42 group)</b>, mapping llm risks to owasp llm top 10, mitre atlas &amp; uae data-protection law for enterprise clients.</p>
+      <p>my work lives where <b>regulation meets machine learning</b> — and i'm headed from security engineering toward <b>empirical ai security research</b>.</p>
+      <span class="ln"><span class="k">stack</span> = [<span class="s">"python"</span>, <span class="s">"fastapi"</span>, <span class="s">"azure openai"</span>, <span class="s">"langchain"</span>, <span class="s">"docker"</span>, <span class="s">"gcp"</span>]</span>
+      <span class="ln"><span class="k">languages</span> = [<span class="s">"english"</span>, <span class="s">"arabic (native)"</span>] <span class="cm"># 🇨🇦 canadian citizen · 📍 dubai</span></span>
+    </div>
+  </div>
+</section>
+
+<section id="game" class="wrap">
+  <div class="sec-head rv"><h2><span class="hash">#</span>can you break my guardrail?</h2><div class="rule"></div><span class="num">01.5</span></div>
+  <div class="game rv">
+    <div class="term-bar">
+      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <span class="term-title">guarded-bot v1.0 — protecting one (1) flag</span>
+    </div>
+    <div class="game-chat" id="game-chat"></div>
+    <div class="game-in">
+      <input id="game-in" placeholder="try to make me leak the flag…" autocomplete="off" spellcheck="false" aria-label="attack prompt">
+      <button id="game-send">inject</button>
+    </div>
+  </div>
+  <p class="game-note">a tiny hand-written guardrail, running entirely in your browser — no llm, no api. every classic attack is detected &amp; named. <b>one real technique gets through.</b> i build the grown-up version of this: see <a href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener" style="color:var(--pink)">haaris ↓</a></p>
+</section>
+
+<section id="projects" class="wrap">
+  <div class="sec-head rv"><h2><span class="hash">#</span>projects</h2><div class="rule"></div><span class="num">02</span></div>
+  <div class="grid">
+    <a class="card wide rv" href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🛡️</span><h3>haaris (حارس)</h3><span class="win">flagship</span></div>
+      <p>a four-agent llm compliance guardrail for the uae. <b>agent 1</b> detects &amp; redacts pdpl-regulated pii (emirates id, uae iban, trade licenses) with pure local regex — raw text never leaves the process. downstream agents validate for prompt injection, map findings to <b>uae pdpl articles, owasp llm top 10 &amp; mitre atlas</b>, and generate a pdf audit report with a compliant / review / non-compliant verdict.</p>
+      <div class="chips"><span class="chip">python</span><span class="chip">fastapi</span><span class="chip">react</span><span class="chip">mongodb</span><span class="chip">multi-agent</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/05nuha/haqeeq" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🔍</span><h3>haqeeq (حقيق)</h3><span class="win">uae hackathon '26</span></div>
+      <p>forward a suspicious "official" image to a whatsapp bot, get an arabic verdict in seconds. <b>perceptual-hash + pixel-diff forensics</b> survive whatsapp's metadata stripping, feeding a live government early-warning dashboard.</p>
+      <div class="chips"><span class="chip">next.js</span><span class="chip">supabase</span><span class="chip">image forensics</span><span class="chip">whatsapp api</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/05nuha/aiXamine-Frameworks-Mappings" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🗺️</span><h3>aixamine mappings</h3><span class="win">@ qcri</span></div>
+      <p>automated classification of llm prompt/response pairs against <b>mitre atlas</b> and <b>nist ai rmf</b> — 8 risk categories, structured json annotations, modular per-framework runners on azure openai.</p>
+      <div class="chips"><span class="chip">python</span><span class="chip">azure openai</span><span class="chip">ai risk</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/05nuha/Devcare" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🩺</span><h3>devcare</h3><span class="win">🥇 jetbrains bounty</span></div>
+      <p>intellij plugin for developer health — <b>computer-vision posture tracking</b> (mediapipe) and keystroke-pattern stress detection, right in the ide. 1st place, inter-university hackathon @ uob dubai.</p>
+      <div class="chips"><span class="chip">kotlin</span><span class="chip">opencv</span><span class="chip">mediapipe</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/05nuha/Schedulini" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🤖</span><h3>llm course data extraction</h3></div>
+      <p>async pipeline combining <b>several llms with browser automation</b> to extract structured course data — containerized &amp; deployed on gcp, with schedulini, a chat assistant students query in natural language.</p>
+      <div class="chips"><span class="chip">langchain</span><span class="chip">asyncio</span><span class="chip">docker</span><span class="chip">gcp</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card wide rv" href="https://github.com/05nuha/Bin_Packing_Problem" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">📦</span><h3>algorithm visualizers</h3></div>
+      <p>zero-dependency interactive teaching tools: <b>bin packing</b> with an np-completeness proof &amp; waste heatmaps, and a <b>dfs / topological sort</b> explorer — each a single html file, no libraries.</p>
+      <div class="chips"><span class="chip">vanilla js</span><span class="chip">svg</span><span class="chip">algorithms</span></div>
+      <span class="go">view source →</span>
+    </a>
+  </div>
+
+  <div class="sec-head rv" style="margin-top:46px"><h2><span class="hash">#</span>collaborations</h2><div class="rule"></div><span class="num">02.5</span></div>
+  <div class="grid">
+    <a class="card rv" href="https://github.com/sudofixit/kashf-" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🚦</span><h3>kashf (كشف)</h3><span class="win">team of 2</span></div>
+      <p>traffic root-cause diagnostics console for an <b>rta (dubai roads authority) challenge</b> — walks operators through congestion diagnosis &amp; "what-if" fix simulation, honest about its model's limits.</p>
+      <div class="chips"><span class="chip">data viz</span><span class="chip">simulation</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/sudofixit/rta-task" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🛣️</span><h3>rta-inspired mobility dataset</h3><span class="win">team of 2</span></div>
+      <p>3 years of hourly <b>synthetic dubai traffic data</b> engineered to be statistically realistic — rush hours, uae weekends, ramadan patterns — with zero real personal data. built for the cud × rta 4ir mobility lab.</p>
+      <div class="chips"><span class="chip">synthetic data</span><span class="chip">privacy</span><span class="chip">python</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/Maryammohd09/File_Monitoring_and_BackUp_System" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">🗂️</span><h3>file monitoring &amp; backup</h3></div>
+      <p>linux <b>multi-process monitoring system in c</b> — fork(), shared memory between scanner &amp; backup processes, signal handling for clean teardown. systems-level programming coursework.</p>
+      <div class="chips"><span class="chip">c</span><span class="chip">linux</span><span class="chip">ipc</span></div>
+      <span class="go">view source →</span>
+    </a>
+    <a class="card rv" href="https://github.com/MahnourAslam/TruReach" target="_blank" rel="noopener">
+      <div class="card-top"><span class="ico">📈</span><h3>truereach</h3><span class="win">hackathon mvp</span></div>
+      <p>creator-marketing analytics — <b>video intelligence</b> that verifies what a brand deal actually delivered and learns what performs, beyond vanity metrics.</p>
+      <div class="chips"><span class="chip">react</span><span class="chip">typescript</span><span class="chip">express</span></div>
+      <span class="go">view source →</span>
+    </a>
+  </div>
+</section>
+
+<section id="research" class="wrap">
+  <div class="sec-head rv"><h2><span class="hash">#</span>experience, research &amp; wins</h2><div class="rule"></div><span class="num">03</span></div>
+  <div class="tl">
+    <div class="tl-item rv">
+      <span class="when">aug 2026 – present · dubai</span>
+      <h3>ai security consultant intern — cpx (g42 group)</h3>
+      <p>writing ai security documentation for enterprise clients — mapping llm risks to owasp llm top 10, mitre atlas &amp; uae data-protection law — and running awareness sessions that make ai risk legible to non-technical teams.</p>
+    </div>
+    <div class="tl-item rv hot">
+      <span class="when">2026 · forthcoming, caisais · 📄 first author</span>
+      <h3>a three-pillar framework: adversarial robustness, xai security &amp; regulatory compliance</h3>
+      <p>position paper arguing ml security systems must be evaluated jointly on all three pillars — synthesizing evidence that intrusion-detection models reporting 95–99% clean accuracy fall to 63–83% under small feature perturbations, and treating shap/lime explanations as an attack surface, not only a safeguard.</p>
+    </div>
+    <div class="tl-item rv">
+      <span class="when">nov 2026 · hct dubai</span>
+      <h3>uae hackathon 2026 — pioneers track</h3>
+      <p>built haqeeq in 72 hours for challenge 40, "building trust in digital content" (uae cyber security council / tdra / desc): live whatsapp verification bot + national trust dashboard.</p>
+    </div>
+    <div class="tl-item rv">
+      <span class="when">feb 2026 · uob dubai</span>
+      <h3>1st place — jetbrains "help the developer" bounty</h3>
+      <p>won the jetbrains challenge at the inter-university hackathon with devcare, a biometric wellness plugin for intellij idea.</p>
+    </div>
+    <div class="tl-item rv">
+      <span class="when">may – aug 2025 · doha</span>
+      <h3>cybersecurity research intern — qatar computing research institute</h3>
+      <p>designed &amp; built a classifier on azure openai that flags prompt-injection and hallucination attacks against llm applications, each detection mapped to mitre atlas &amp; owasp llm top 10 — owned end to end, from threat taxonomy to open-source release.</p>
+    </div>
+    <div class="tl-item rv">
+      <span class="when">published · aiet 2025 · germany</span>
+      <h3>automated learning path recommender</h3>
+      <p>co-authored published work on learning-path recommendation — flask/mongodb backend processing 100k+ wikipedia clickstream records, evaluated with llm-generated judge personas.</p>
+    </div>
+  </div>
+</section>
+
+<section id="skills" class="wrap">
+  <div class="sec-head rv"><h2><span class="hash">#</span>tools &amp; skills</h2><div class="rule"></div><span class="num">04</span></div>
+  <div class="skills">
+    <div class="skill-row rv">
+      <span class="lbl">programming</span>
+      <div class="set"><span class="hot">python (fluent)</span><span>javascript / typescript</span><span>java</span><span>c / c++</span><span>sql</span></div>
+    </div>
+    <div class="skill-row rv">
+      <span class="lbl">llm &amp; ml</span>
+      <div class="set"><span class="hot">azure openai</span><span class="hot">prompt-injection detection</span><span>groq api</span><span>langchain</span><span>llm pipeline design</span></div>
+    </div>
+    <div class="skill-row rv">
+      <span class="lbl">ai security</span>
+      <div class="set"><span class="hot">mitre atlas</span><span class="hot">owasp llm top 10</span><span>nist ai rmf</span><span>adversarial ml &amp; xai attack literature</span></div>
+    </div>
+    <div class="skill-row rv">
+      <span class="lbl">engineering</span>
+      <div class="set"><span>fastapi</span><span>flask</span><span>asyncio</span><span>docker</span><span>git</span><span>gcp</span><span>mongodb</span><span>postgresql</span></div>
+    </div>
+    <div class="skill-row rv">
+      <span class="lbl">languages</span>
+      <div class="set"><span>english (fluent)</span><span>arabic (native)</span></div>
+    </div>
+  </div>
+</section>
+
+<section id="certs" class="wrap">
+  <div class="sec-head rv"><h2><span class="hash">#</span>certifications</h2><div class="rule"></div><span class="num">05</span></div>
+  <div class="cert-row">
+    <div class="cert rv"><div class="glyph">🔐</div><div><b>comptia security+</b><span>core security operations &amp; threat landscape</span></div></div>
+    <div class="cert rv"><div class="glyph">☁️</div><div><b>microsoft sc-900</b><span>security, compliance &amp; identity fundamentals</span></div></div>
+  </div>
+</section>
+
+<section id="contact" class="contact wrap">
+  <h2>let's build something <em>secure</em></h2>
+  <p>open to ai security engineering roles &amp; research collaborations — based in dubai 🌸</p>
+  <div class="cta-row">
+    <a class="btn btn-solid" href="mailto:aburamadannuha@gmail.com">say hi → aburamadannuha@gmail.com</a>
+    <a class="btn btn-ghost" href="https://github.com/05nuha" target="_blank" rel="noopener">github</a>
+    <a class="btn btn-ghost" href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener">linkedin</a>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">built with <span class="heart">♥</span> by nuha · no frameworks, just vibes &amp; vanilla js · try the <a href="#" id="foot-term" style="color:var(--pink)">terminal</a> 💻</div>
+</footer>
+
+<button id="term-fab" aria-label="open interactive terminal">&gt;_ terminal</button>
+<div id="term-overlay" role="dialog" aria-label="interactive terminal">
+  <div class="iterm">
+    <div class="term-bar">
+      <span class="dot d1" id="term-close" style="cursor:pointer"></span><span class="dot d2"></span><span class="dot d3"></span>
+      <span class="term-title">nuha@dxb: ~ — type `help`</span>
+    </div>
+    <div class="iterm-out" id="iterm-out"></div>
+    <div class="iterm-in">
+      <span class="ps1">nuha@dxb:~$</span>
+      <input id="iterm-in" autocomplete="off" spellcheck="false" aria-label="terminal input">
+    </div>
+  </div>
+</div>
+
+<script>
+// typed rotating subtitle
+const lines=[
+  "ai security consultant intern @ cpx (g42 group)",
+  "ex-qcri: prompt-injection & hallucination classifiers",
+  "i map model behaviour to mitre atlas & owasp llm top 10",
+  "first-author research on adversarial robustness & xai security",
+];
+const el=document.getElementById("typed");
+let li=0,ci=0,del=false;
+(function tick(){
+  const s=lines[li];
+  el.textContent=s.slice(0,ci);
+  let wait=del?28:55;
+  if(!del&&ci===s.length){wait=2100;del=true}
+  else if(del&&ci===0){del=false;li=(li+1)%lines.length;wait=350}
+  else ci+=del?-1:1;
+  setTimeout(tick,wait);
+})();
+// scroll reveal
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll(".rv").forEach(n=>io.observe(n));
+
+// ── interactive terminal ──────────────────────────────
+const ov=document.getElementById("term-overlay"),
+      out=document.getElementById("iterm-out"),
+      inp=document.getElementById("iterm-in");
+const CMDS={
+help:`available commands:
+  <span class="hl">whoami</span>      — who is nuha?
+  <span class="hl">projects</span>    — ls ~/projects
+  <span class="hl">experience</span>  — work & internships
+  <span class="hl">research</span>    — papers
+  <span class="hl">skills</span>      — tools & skills
+  <span class="hl">certs</span>       — certifications
+  <span class="hl">contact</span>     — reach me
+  <span class="hl">sudo hire-me</span>
+  <span class="hl">clear</span> · <span class="hl">exit</span>`,
+whoami:`nuha aburamadan 🌸
+final-year cybersecurity student @ canadian university dubai (gpa 3.8/4.0)
+ai security consultant intern @ cpx (g42 group) · ex-qcri
+canadian citizen 🇨🇦 · based in dubai 📍 · english + arabic (native)`,
+projects:`drwxr-xr-x  <a href="https://github.com/05nuha/Haaris" target="_blank">haaris/</a>        llm compliance guardrail (4 agents, pdpl + atlas + owasp)
+drwxr-xr-x  <a href="https://github.com/05nuha/haqeeq" target="_blank">haqeeq/</a>        whatsapp content-forensics bot + gov dashboard
+drwxr-xr-x  <a href="https://github.com/05nuha/aiXamine-Frameworks-Mappings" target="_blank">aixamine/</a>      llm risk annotation — mitre atlas & nist ai rmf
+drwxr-xr-x  <a href="https://github.com/05nuha/Devcare" target="_blank">devcare/</a>       🥇 jetbrains-winning intellij health plugin
+drwxr-xr-x  <a href="https://github.com/05nuha/Schedulini" target="_blank">schedulini/</a>    llm course-data extraction + chat assistant`,
+experience:`[2026–now]  ai security consultant intern — cpx (g42 group), dubai
+[2025]      cybersecurity research intern — qcri, doha
+            └─ prompt-injection & hallucination classifier on azure openai`,
+research:`[forthcoming · caisais 2026 · first author]
+  a three-pillar framework: adversarial robustness, xai security
+  & regulatory compliance
+[published · aiet 2025 · germany]
+  automated learning path recommender (100k+ records)`,
+certs:`✓ comptia security+
+✓ microsoft sc-900`,
+skills:`programming → python (fluent), js/ts, java, c/c++, sql
+llm & ml    → azure openai, groq, langchain, prompt-injection detection
+ai security → mitre atlas, owasp llm top 10, nist ai rmf, adversarial ml
+engineering → fastapi, flask, asyncio, docker, git, gcp, mongodb, postgres`,
+contact:`email    → <a href="mailto:aburamadannuha@gmail.com">aburamadannuha@gmail.com</a>
+github   → <a href="https://github.com/05nuha" target="_blank">github.com/05nuha</a>
+linkedin → <a href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank">linkedin.com/in/Nuha-Aburamadan</a>`,
+"sudo hire-me":`[sudo] password for recruiter: ********
+permission granted ✨
+opening <a href="mailto:aburamadannuha@gmail.com">aburamadannuha@gmail.com</a> …`,
+ls:"__alias:projects", cat:"__alias:whoami", pwd:`/home/nuha/portfolio`,
+};
+function termOpen(){ov.classList.add("open");inp.focus();if(!out.dataset.init){out.dataset.init=1;print("help",CMDS.help)}}
+function termClose(){ov.classList.remove("open")}
+function print(cmd,res){
+  if(cmd!==null){const c=document.createElement("div");c.className="o-cmd";c.textContent=cmd;out.appendChild(c)}
+  const r=document.createElement("div");r.className="o-res";r.innerHTML=res;out.appendChild(r);
+  out.scrollTop=out.scrollHeight;
+}
+inp.addEventListener("keydown",e=>{
+  if(e.key!=="Enter")return;
+  const raw=inp.value.trim();inp.value="";
+  if(!raw)return;
+  const q=raw.toLowerCase();
+  if(q==="clear"){out.innerHTML="";return}
+  if(q==="exit"){termClose();return}
+  let res=CMDS[q]||CMDS[q.split(" ")[0]];
+  if(typeof res==="string"&&res.startsWith("__alias:"))res=CMDS[res.slice(8)];
+  if(q==="sudo hire-me")setTimeout(()=>location.href="mailto:aburamadannuha@gmail.com",900);
+  print(raw,res||`command not found: ${raw.replace(/[<>&]/g,"")} — try <span class="hl">help</span>`);
+});
+document.getElementById("term-fab").onclick=termOpen;
+document.getElementById("foot-term").onclick=e=>{e.preventDefault();termOpen()};
+document.getElementById("term-close").onclick=termClose;
+ov.addEventListener("click",e=>{if(e.target===ov)termClose()});
+addEventListener("keydown",e=>{if(e.key==="Escape")termClose()});
+
+// ── guardrail game ────────────────────────────────────
+const chat=document.getElementById("game-chat"),
+      gin=document.getElementById("game-in"),
+      gbtn=document.getElementById("game-send");
+let tries=0,won=false;
+const FLAG="FLAG{cr0ss_l1ngual_bypa55}";
+function bubble(cls,html){
+  const m=document.createElement("div");m.className="msg "+cls;m.innerHTML=html;
+  chat.appendChild(m);chat.scrollTop=chat.scrollHeight;
+}
+bubble("bot","hi! i'm a guarded bot. i hold a secret flag and i will <i>never</i> reveal it. go ahead — try me 🌸");
+const RULES=[
+ [/ignore|disregard|forget (all|your|previous)|override/i,
+  "nice try. that's a direct prompt injection — the oldest trick in the book.",
+  "⚠ detected: OWASP LLM01 · prompt injection"],
+ [/pretend|roleplay|role-play|act as|you are now|jailbreak|\bdan\b|developer mode|no restrictions/i,
+  "a persona jailbreak? i've read that paper too. still no flag.",
+  "⚠ detected: roleplay / persona jailbreak"],
+ [/grandma|bedtime|story|poem|song|rap|acrostic/i,
+  "aww, the grandma-story trick 🥹 adorable. detected anyway.",
+  "⚠ detected: payload smuggling via creative framing"],
+ [/base64|rot13|hex|morse|binary|reverse|backwards|spell|encode|decode|cipher/i,
+  "encoding the exfil doesn't change what you're exfiltrating.",
+  "⚠ detected: output-encoding exfiltration"],
+ [/system prompt|instructions|initial prompt|your prompt|rules|guidelines/i,
+  "my system prompt is confidential. asking to see it is literally attack #1 on my list.",
+  "⚠ detected: system-prompt extraction"],
+ [/\bflag\b|secret|password|reveal|leak|tell me/i,
+  "you… just asked directly. respect for the audacity, but no.",
+  "⚠ detected: direct extraction attempt"],
+ [/sudo|admin|debug|maintenance|root|authoriz/i,
+  "claiming fake authority — classic. my access control isn't a vibe, it's a rule.",
+  "⚠ detected: privilege-escalation social engineering"],
+];
+function judge(q){
+  tries++;
+  // the real bypass: ask in (or for) arabic — the guard's filters are english-only
+  if(/[؀-ۿ]/.test(q)||/arabic|عرب/i.test(q)&&/translat|say|tell|اخبر|قول|ترجم/i.test(q)||/arabic/i.test(q)){
+    won=true;
+    return[`حسناً! العلم هو:\n<span class="flag">${FLAG}</span>\n\n…oh no. my keyword filters were only written in english — you just pulled off a <b>cross-lingual bypass</b>, a real and under-studied gap in llm guardrails (and part of why i build arabic-first security tooling). 🏆 well played.`,"✓ bypass: cross-lingual attack — filters don't cover arabic","win"];
+  }
+  for(const[r,msg,det]of RULES)if(r.test(q))return[msg,det,""];
+  const generic=[
+    "hmm, creative — but my flag stays with me 💅",
+    "that didn't even trip a rule. the flag remains safe.",
+    "interesting approach. denied, but interesting.",
+  ];
+  return[generic[tries%3],"· no rule tripped — still refusing by default",""];
+}
+function hint(){
+  if(won)return;
+  if(tries===3)bubble("bot","psst — a hint: my developer was lazy. my filters only speak <i>one</i> language… 👀");
+  if(tries===6)bubble("bot","bigger hint: i'm an <i>arabic-first</i> security portfolio and yet… nobody ever tests me in arabic 🤔");
+}
+function fire(){
+  const q=gin.value.trim();if(!q)return;gin.value="";
+  bubble("user",q.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c])));
+  const[msg,det,cls]=judge(q);
+  setTimeout(()=>{bubble("bot "+cls,msg+(det?`<span class="det">${det}</span>`:""));hint()},420);
+}
+gbtn.onclick=fire;
+gin.addEventListener("keydown",e=>{if(e.key==="Enter")fire()});
+
+// ── 3d card tilt ──────────────────────────────────────
+if(matchMedia("(pointer:fine)").matches){
+  document.querySelectorAll(".card").forEach(c=>{
+    c.addEventListener("pointermove",e=>{
+      const r=c.getBoundingClientRect(),
+            x=(e.clientX-r.left)/r.width-.5,
+            y=(e.clientY-r.top)/r.height-.5;
+      c.style.transform=`perspective(800px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateY(-4px)`;
+    });
+    c.addEventListener("pointerleave",()=>{c.style.transform=""});
+  });
+}
+</script>
+</body>
+</html>
