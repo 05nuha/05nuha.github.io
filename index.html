@@ -66,22 +66,22 @@ nav{
 .nav-links a:hover::before{opacity:1}
 
 /* hero */
-header{padding:110px 0 70px}
+header{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:90px 0 60px;position:relative}
 .prompt-line{color:var(--dim);font-size:13px;margin-bottom:18px}
 .prompt-line .u{color:var(--mint)}
 .prompt-line .p{color:var(--lav)}
 h1{
-  font-size:clamp(34px,6vw,62px);font-weight:500;letter-spacing:-.02em;line-height:1.12;
+  font-size:clamp(36px,6.5vw,72px);font-weight:500;letter-spacing:-.02em;line-height:1.12;
   margin-bottom:8px;
 }
 h1 .accent{
   font-family:var(--serif);font-style:italic;font-weight:300;color:var(--pink);
   text-shadow:0 0 28px rgba(255,139,184,.45);
 }
-.typed-wrap{min-height:32px;margin:14px 0 26px;font-size:clamp(15px,2.4vw,19px);color:var(--dim)}
+.typed-wrap{min-height:32px;margin:18px 0 34px;font-size:clamp(15px,2.4vw,19px);color:var(--dim)}
 .typed::after{content:"▌";color:var(--pink);animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
-.hero-tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:34px}
+.hero-tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:44px}
 .tag{
   font-size:12px;padding:5px 12px;border:1px solid var(--line2);border-radius:999px;
   color:var(--pink-hi);background:rgba(255,139,184,.06);
@@ -96,13 +96,21 @@ h1 .accent{
 .btn-ghost{border:1px solid var(--line2);color:var(--pink-hi)}
 .btn-ghost:hover{background:rgba(255,139,184,.08);border-color:var(--pink)}
 
+/* scroll indicator */
+.scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
+  width:26px;height:44px;border:2px solid var(--line2);border-radius:14px;display:flex;justify-content:center}
+.scroll-cue i{width:4px;height:9px;border-radius:2px;background:var(--pink);margin-top:7px;
+  animation:cue 1.6s ease-in-out infinite}
+@keyframes cue{0%{opacity:1;transform:translateY(0)}70%{opacity:0;transform:translateY(16px)}100%{opacity:0}}
+
 /* sections */
-section{padding:64px 0}
-.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:34px}
-.sec-head h2{font-size:21px;font-weight:500;letter-spacing:.01em;white-space:nowrap}
-.sec-head h2 .hash{color:var(--pink);margin-right:6px}
-.sec-head .rule{flex:1;height:1px;background:linear-gradient(90deg,var(--line2),transparent)}
-.sec-head .num{font-size:12px;color:var(--pink-dim)}
+section{padding:clamp(90px,11vh,140px) 0}
+.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:56px}
+.sec-head h2{font-size:clamp(26px,4vw,38px);font-weight:600;letter-spacing:-.01em;order:2}
+.sec-head h2 .hash{color:var(--pink);margin-right:8px}
+.sec-head .rule{order:3;width:64px;height:3px;border-radius:2px;margin-top:4px;
+  background:linear-gradient(90deg,var(--pink),transparent)}
+.sec-head .num{order:1;font-size:12px;color:var(--pink-dim);letter-spacing:.3em;text-transform:uppercase}
 
 /* terminal card (about) */
 .term{
@@ -152,10 +160,10 @@ section{padding:64px 0}
 .game-note b{color:var(--pink-dim);font-weight:500}
 
 /* projects */
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
 @media (max-width:700px){.grid{grid-template-columns:1fr}}
 .card{
-  position:relative;border:1px solid var(--line);border-radius:12px;padding:24px;
+  position:relative;border:1px solid var(--line);border-radius:14px;padding:30px;
   background:linear-gradient(160deg, rgba(255,139,184,.045), rgba(22,14,32,.6) 45%);
   text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;
   transition:transform .25s, border-color .25s, box-shadow .25s;
@@ -182,27 +190,27 @@ section{padding:64px 0}
 .card.wide{grid-column:1/-1}
 
 /* timeline (research & wins) */
-.tl{border-left:1px solid var(--line2);margin-left:6px;padding-left:28px;display:flex;flex-direction:column;gap:30px}
+.tl{border-left:1px solid var(--line2);margin-left:6px;padding-left:34px;display:flex;flex-direction:column;gap:52px}
 .tl-item{position:relative}
 .tl-item::before{
-  content:"";position:absolute;left:-33.5px;top:7px;width:10px;height:10px;border-radius:50%;
+  content:"";position:absolute;left:-39.5px;top:7px;width:10px;height:10px;border-radius:50%;
   background:var(--bg);border:2px solid var(--pink);box-shadow:0 0 12px rgba(255,139,184,.6);
 }
 .tl-item .when{font-size:11.5px;color:var(--pink-dim);letter-spacing:.08em;text-transform:uppercase}
 .tl-item.hot{border:1px solid var(--line2);border-radius:12px;padding:18px 20px;margin-left:-20px;
   background:linear-gradient(160deg, rgba(255,139,184,.07), transparent 55%);
   box-shadow:0 0 30px rgba(255,139,184,.08)}
-.tl-item.hot::before{left:-53.5px;top:25px}
+.tl-item.hot::before{left:-59.5px;top:25px}
 .tl-item h3{font-size:16px;font-weight:600;margin:4px 0 6px}
 .tl-item h3 a{color:var(--pink-hi);text-decoration:none;border-bottom:1px dashed var(--line2)}
 .tl-item h3 a:hover{color:var(--pink)}
 .tl-item p{color:var(--dim);font-size:13.5px;max-width:68ch}
 
 /* skills */
-.skills{display:flex;flex-direction:column;gap:14px}
+.skills{display:flex;flex-direction:column;gap:18px}
 .skill-row{
   display:flex;gap:18px;align-items:baseline;border:1px solid var(--line);border-radius:12px;
-  padding:16px 20px;background:var(--panel);flex-wrap:wrap;
+  padding:22px 26px;background:var(--panel);flex-wrap:wrap;
 }
 .skill-row .lbl{
   min-width:130px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);
@@ -218,7 +226,7 @@ section{padding:64px 0}
 .skill-row .set span.hot{color:var(--pink-hi);border-color:var(--line2);font-weight:500}
 
 /* certs */
-.cert-row{display:flex;gap:16px;flex-wrap:wrap}
+.cert-row{display:flex;gap:24px;flex-wrap:wrap}
 .cert{
   flex:1;min-width:230px;border:1px solid var(--line);border-radius:12px;padding:20px 22px;
   background:var(--panel);display:flex;gap:14px;align-items:center;
@@ -232,7 +240,7 @@ section{padding:64px 0}
 
 /* contact */
 .contact{
-  text-align:center;padding:72px 0 40px;
+  text-align:center;padding:clamp(110px,18vh,190px) 0 90px;
 }
 .contact h2{font-size:clamp(26px,4.5vw,40px);font-weight:500;margin-bottom:10px}
 .contact h2 em{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--pink);
@@ -289,7 +297,6 @@ footer .heart{color:var(--pink)}
 .rv.in{opacity:1;transform:none}
 
 @media (max-width:640px){
-  header{padding:70px 0 50px}
   .nav-links{gap:14px}
   .nav-links a::before{display:none}
 }
@@ -324,10 +331,11 @@ footer .heart{color:var(--pink)}
     <a class="btn btn-ghost" href="https://github.com/05nuha" target="_blank" rel="noopener">github</a>
     <a class="btn btn-ghost" href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener">linkedin</a>
   </div>
+  <a class="scroll-cue" href="#about" aria-label="scroll down"><i></i></a>
 </header>
 
 <section id="about" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>about</h2><div class="rule"></div><span class="num">01</span></div>
+  <div class="sec-head rv"><h2><span class="hash">#</span>about</h2><div class="rule"></div><span class="num">01 · introduction</span></div>
   <div class="term rv">
     <div class="term-bar">
       <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
@@ -344,7 +352,7 @@ footer .heart{color:var(--pink)}
 </section>
 
 <section id="game" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>can you break my guardrail?</h2><div class="rule"></div><span class="num">01.5</span></div>
+  <div class="sec-head rv"><h2><span class="hash">#</span>can you break my guardrail?</h2><div class="rule"></div><span class="num">01.5 · play the attacker</span></div>
   <div class="game rv">
     <div class="term-bar">
       <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
@@ -360,7 +368,7 @@ footer .heart{color:var(--pink)}
 </section>
 
 <section id="projects" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>projects</h2><div class="rule"></div><span class="num">02</span></div>
+  <div class="sec-head rv"><h2><span class="hash">#</span>projects</h2><div class="rule"></div><span class="num">02 · what i have built</span></div>
   <div class="grid">
     <a class="card wide rv" href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener">
       <div class="card-top"><span class="ico">🛡️</span><h3>haaris (حارس)</h3><span class="win">flagship</span></div>
@@ -400,7 +408,7 @@ footer .heart{color:var(--pink)}
     </a>
   </div>
 
-  <div class="sec-head rv" style="margin-top:46px"><h2><span class="hash">#</span>collaborations</h2><div class="rule"></div><span class="num">02.5</span></div>
+  <div class="sec-head rv" style="margin-top:46px"><h2><span class="hash">#</span>collaborations</h2><div class="rule"></div><span class="num">02.5 · built with friends</span></div>
   <div class="grid">
     <a class="card rv" href="https://github.com/sudofixit/kashf-" target="_blank" rel="noopener">
       <div class="card-top"><span class="ico">🚦</span><h3>kashf (كشف)</h3><span class="win">team of 2</span></div>
@@ -430,7 +438,7 @@ footer .heart{color:var(--pink)}
 </section>
 
 <section id="research" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>experience, research &amp; wins</h2><div class="rule"></div><span class="num">03</span></div>
+  <div class="sec-head rv"><h2><span class="hash">#</span>experience, research &amp; wins</h2><div class="rule"></div><span class="num">03 · where i have been</span></div>
   <div class="tl">
     <div class="tl-item rv">
       <span class="when">aug 2026 – present · dubai</span>
@@ -466,7 +474,7 @@ footer .heart{color:var(--pink)}
 </section>
 
 <section id="skills" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>tools &amp; skills</h2><div class="rule"></div><span class="num">04</span></div>
+  <div class="sec-head rv"><h2><span class="hash">#</span>tools &amp; skills</h2><div class="rule"></div><span class="num">04 · what i work with</span></div>
   <div class="skills">
     <div class="skill-row rv">
       <span class="lbl">programming</span>
@@ -492,7 +500,7 @@ footer .heart{color:var(--pink)}
 </section>
 
 <section id="certs" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>certifications</h2><div class="rule"></div><span class="num">05</span></div>
+  <div class="sec-head rv"><h2><span class="hash">#</span>certifications</h2><div class="rule"></div><span class="num">05 · credentials</span></div>
   <div class="cert-row">
     <div class="cert rv"><div class="glyph">🔐</div><div><b>comptia security+</b><span>core security operations &amp; threat landscape</span></div></div>
     <div class="cert rv"><div class="glyph">☁️</div><div><b>microsoft sc-900</b><span>security, compliance &amp; identity fundamentals</span></div></div>
