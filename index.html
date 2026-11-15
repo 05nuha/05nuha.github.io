@@ -28,6 +28,7 @@
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
+section,header{scroll-margin-top:64px}
 body{
   background:var(--bg);color:var(--txt);font-family:var(--mono);
   font-size:15px;line-height:1.7;overflow-x:hidden;
@@ -52,10 +53,19 @@ body::after{
 .wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 24px}
 
 /* nav */
+#progress{
+  position:fixed;top:0;left:0;height:3px;width:0;z-index:40;
+  background:linear-gradient(90deg,var(--pink),var(--lav));
+  box-shadow:0 0 12px rgba(255,139,184,.6);
+}
 nav{
   position:sticky;top:0;z-index:10;backdrop-filter:blur(14px);
-  background:rgba(11,7,16,.72);border-bottom:1px solid var(--line);
+  background:rgba(11,7,16,.5);border-bottom:1px solid transparent;
+  transition:background .3s,border-color .3s;
 }
+nav.scrolled{background:rgba(11,7,16,.82);border-bottom-color:var(--line)}
+.nav-links a.active{color:var(--pink-hi)}
+.nav-links a.active::before{opacity:1}
 .nav-in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
 .logo{color:var(--pink);font-weight:700;text-decoration:none;letter-spacing:.04em}
 .logo .tld{color:var(--dim);font-weight:300}
@@ -96,6 +106,28 @@ h1 .accent{
 .btn-ghost{border:1px solid var(--line2);color:var(--pink-hi)}
 .btn-ghost:hover{background:rgba(255,139,184,.08);border-color:var(--pink)}
 
+/* hero orbit art */
+.hero-art{
+  position:absolute;right:2%;top:50%;width:380px;height:380px;margin-top:-190px;
+  pointer-events:none;z-index:0;opacity:.85;
+}
+header>*:not(.hero-art){position:relative;z-index:1}
+.ring{position:absolute;inset:0;border:1px dashed rgba(255,139,184,.25);border-radius:50%;
+  animation:spin 40s linear infinite}
+.ring.r2{inset:52px;border-color:rgba(201,166,255,.22);animation-duration:28s;animation-direction:reverse}
+.ring.r3{inset:110px;border-style:solid;border-color:rgba(255,139,184,.12);animation:none}
+.ring .sat{position:absolute;top:-13px;left:50%;margin-left:-13px;width:26px;height:26px;border-radius:50%;
+  display:grid;place-items:center;font-size:13px;background:var(--panel);border:1px solid var(--line2);
+  box-shadow:0 0 14px rgba(255,139,184,.3)}
+.orb{position:absolute;inset:135px;border-radius:50%;display:grid;place-items:center;font-size:44px;
+  background:radial-gradient(circle at 36% 32%, rgba(255,179,209,.35), rgba(255,139,184,.12) 55%, transparent 75%);
+  border:1px solid var(--line2);
+  box-shadow:0 0 70px rgba(255,139,184,.3), inset 0 0 36px rgba(255,139,184,.12);
+  animation:bob 5.5s ease-in-out infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes bob{0%,100%{transform:translateY(-7px)}50%{transform:translateY(7px)}}
+@media (max-width:1100px){.hero-art{display:none}}
+
 /* scroll indicator */
 .scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
   width:26px;height:44px;border:2px solid var(--line2);border-radius:14px;display:flex;justify-content:center}
@@ -114,6 +146,7 @@ section{padding:clamp(90px,11vh,140px) 0}
 
 /* terminal card (about) */
 .term{
+  max-width:860px;
   border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--panel);
   box-shadow:0 18px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,139,184,.04), 0 0 46px rgba(255,139,184,.07);
 }
@@ -200,7 +233,7 @@ section{padding:clamp(90px,11vh,140px) 0}
 .tl-item.hot{border:1px solid var(--line2);border-radius:12px;padding:18px 20px;margin-left:-20px;
   background:linear-gradient(160deg, rgba(255,139,184,.07), transparent 55%);
   box-shadow:0 0 30px rgba(255,139,184,.08)}
-.tl-item.hot::before{left:-59.5px;top:25px}
+.tl-item.hot::before{left:-19.5px;top:25px}
 .tl-item h3{font-size:16px;font-weight:600;margin:4px 0 6px}
 .tl-item h3 a{color:var(--pink-hi);text-decoration:none;border-bottom:1px dashed var(--line2)}
 .tl-item h3 a:hover{color:var(--pink)}
@@ -304,7 +337,8 @@ footer .heart{color:var(--pink)}
 </head>
 <body>
 
-<nav>
+<div id="progress"></div>
+<nav id="topnav">
   <div class="nav-in">
     <a class="logo" href="#">nuha<span class="tld">.sec</span></a>
     <div class="nav-links">
@@ -330,6 +364,12 @@ footer .heart{color:var(--pink)}
     <a class="btn btn-solid" href="#projects">see my work ↓</a>
     <a class="btn btn-ghost" href="https://github.com/05nuha" target="_blank" rel="noopener">github</a>
     <a class="btn btn-ghost" href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener">linkedin</a>
+  </div>
+  <div class="hero-art" aria-hidden="true">
+    <div class="ring"><span class="sat">🔐</span></div>
+    <div class="ring r2"><span class="sat">🌸</span></div>
+    <div class="ring r3"></div>
+    <div class="orb">🛡️</div>
   </div>
   <a class="scroll-cue" href="#about" aria-label="scroll down"><i></i></a>
 </header>
@@ -555,9 +595,41 @@ let li=0,ci=0,del=false;
   else ci+=del?-1:1;
   setTimeout(tick,wait);
 })();
-// scroll reveal
+// scroll reveal (staggered per container)
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
-document.querySelectorAll(".rv").forEach(n=>io.observe(n));
+document.querySelectorAll(".rv").forEach(n=>{
+  const sibs=[...n.parentElement.children].filter(c=>c.classList&&c.classList.contains("rv"));
+  if(sibs.length>1)n.style.transitionDelay=Math.min(sibs.indexOf(n)*90,450)+"ms";
+  io.observe(n);
+});
+
+// scroll-driven: progress bar, nav state, hero parallax, scrollspy
+const prog=document.getElementById("progress"),
+      topnav=document.getElementById("topnav"),
+      hero=document.querySelector("header"),
+      heroKids=hero.querySelectorAll(".prompt-line,h1,.typed-wrap,.hero-tags,.cta-row"),
+      heroArt=hero.querySelector(".hero-art"),
+      spyLinks=[...document.querySelectorAll(".nav-links a")],
+      spyTargets=spyLinks.map(a=>document.querySelector(a.getAttribute("href")));
+let ticking=false;
+function onScroll(){
+  if(ticking)return;ticking=true;
+  requestAnimationFrame(()=>{
+    const y=scrollY,max=document.documentElement.scrollHeight-innerHeight;
+    prog.style.width=(max>0?y/max*100:0)+"%";
+    topnav.classList.toggle("scrolled",y>40);
+    if(y<innerHeight){
+      const t=y/innerHeight;
+      heroKids.forEach((el,i)=>{el.style.transform=`translateY(${y*(.12+i*.05)}px)`;el.style.opacity=1-t*1.25});
+      if(heroArt){heroArt.style.transform=`translateY(${y*.28}px) rotate(${y*.03}deg)`;heroArt.style.opacity=1-t*1.4}
+    }
+    let cur=-1;
+    spyTargets.forEach((sec,i)=>{if(sec&&sec.getBoundingClientRect().top<innerHeight*.4)cur=i});
+    spyLinks.forEach((a,i)=>a.classList.toggle("active",i===cur));
+    ticking=false;
+  });
+}
+addEventListener("scroll",onScroll,{passive:true});onScroll();
 
 // ── interactive terminal ──────────────────────────────
 const ov=document.getElementById("term-overlay"),
