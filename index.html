@@ -192,6 +192,26 @@ section{padding:clamp(90px,11vh,140px) 0}
 .game-note{font-size:12px;color:var(--dim);margin-top:14px}
 .game-note b{color:var(--pink-dim);font-weight:500}
 
+/* project previews */
+.card-prev{
+  border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0d0813;
+  margin-bottom:6px;
+}
+.prev-bar{display:flex;align-items:center;gap:5px;padding:7px 11px;border-bottom:1px solid var(--line);
+  background:rgba(255,139,184,.04)}
+.prev-bar b{width:8px;height:8px;border-radius:50%;background:rgba(255,139,184,.35)}
+.prev-bar span{margin-left:6px;font-size:10px;color:var(--dim);letter-spacing:.04em}
+.card-prev .shot{overflow:hidden;aspect-ratio:16/9.4}
+.card-prev img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;
+  transition:transform .55s cubic-bezier(.2,.7,.2,1)}
+.card:hover .card-prev img{transform:scale(1.05)}
+.card-prev pre{margin:0;padding:16px 18px;aspect-ratio:16/9.4;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
+  font-family:var(--mono);font-size:11.5px;line-height:2;color:var(--dim);white-space:pre-wrap}
+.card-prev pre .g{color:var(--mint)}
+.card-prev pre .pk{color:var(--pink-hi)}
+.card-prev pre .lv{color:var(--lav)}
+.card.wide .card-prev .shot,.card.wide .card-prev pre{aspect-ratio:21/8}
+
 /* projects */
 .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
 @media (max-width:700px){.grid{grid-template-columns:1fr}}
@@ -411,36 +431,49 @@ footer .heart{color:var(--pink)}
   <div class="sec-head rv"><h2><span class="hash">#</span>projects</h2><div class="rule"></div><span class="num">02 · what i have built</span></div>
   <div class="grid">
     <a class="card wide rv" href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>localhost:5173 — haaris dashboard</span></div><div class="shot"><img src="assets/prev-haaris.jpg" alt="localhost:5173 — haaris dashboard interface preview" loading="lazy"></div></div>
       <div class="card-top"><span class="ico">🛡️</span><h3>haaris (حارس)</h3><span class="win">flagship</span></div>
       <p>a four-agent llm compliance guardrail for the uae. <b>agent 1</b> detects &amp; redacts pdpl-regulated pii (emirates id, uae iban, trade licenses) with pure local regex — raw text never leaves the process. downstream agents validate for prompt injection, map findings to <b>uae pdpl articles, owasp llm top 10 &amp; mitre atlas</b>, and generate a pdf audit report with a compliant / review / non-compliant verdict.</p>
       <div class="chips"><span class="chip">python</span><span class="chip">fastapi</span><span class="chip">react</span><span class="chip">mongodb</span><span class="chip">multi-agent</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/05nuha/haqeeq" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>haqeeq.vercel.app/dashboard</span></div><div class="shot"><img src="assets/prev-haqeeq.jpg" alt="haqeeq.vercel.app/dashboard interface preview" loading="lazy"></div></div>
       <div class="card-top"><span class="ico">🔍</span><h3>haqeeq (حقيق)</h3><span class="win">uae hackathon '26</span></div>
       <p>forward a suspicious "official" image to a whatsapp bot, get an arabic verdict in seconds. <b>perceptual-hash + pixel-diff forensics</b> survive whatsapp's metadata stripping, feeding a live government early-warning dashboard.</p>
       <div class="chips"><span class="chip">next.js</span><span class="chip">supabase</span><span class="chip">image forensics</span><span class="chip">whatsapp api</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/05nuha/aiXamine-Frameworks-Mappings" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>run_mitre.py — annotation output</span></div><pre><span class="pk">$ python main.py --pair sample_017</span>
+category: <span class="g">code_security</span>
+mitre_atlas: [<span class="lv">AML.T0051</span> llm prompt injection]
+nist_ai_rmf: [<span class="lv">MEASURE 2.7</span>] · confidence 0.91 <span class="g">✓</span></pre></div>
       <div class="card-top"><span class="ico">🗺️</span><h3>aixamine mappings</h3><span class="win">@ qcri</span></div>
       <p>automated classification of llm prompt/response pairs against <b>mitre atlas</b> and <b>nist ai rmf</b> — 8 risk categories, structured json annotations, modular per-framework runners on azure openai.</p>
       <div class="chips"><span class="chip">python</span><span class="chip">azure openai</span><span class="chip">ai risk</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/05nuha/Devcare" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>devcare — live monitors</span></div><pre>[posture] <span class="pk">slouch detected</span> · neck angle 12°
+[stress]  typing cadence <span class="pk">↑ 18%</span> · last break 94 min
+[action]  <span class="g">break suggested ☕</span> — shown in ide statusbar</pre></div>
       <div class="card-top"><span class="ico">🩺</span><h3>devcare</h3><span class="win">🥇 jetbrains bounty</span></div>
       <p>intellij plugin for developer health — <b>computer-vision posture tracking</b> (mediapipe) and keystroke-pattern stress detection, right in the ide. 1st place, inter-university hackathon @ uob dubai.</p>
       <div class="chips"><span class="chip">kotlin</span><span class="chip">opencv</span><span class="chip">mediapipe</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/05nuha/Schedulini" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>pipeline — async run</span></div><pre>[browser] portal login <span class="g">✓</span> · 142 course rows found
+[llm×3]   parsing timetables… <span class="g">138/142 structured</span>
+[gcp]     container deployed · csv + api ready <span class="g">✓</span></pre></div>
       <div class="card-top"><span class="ico">🤖</span><h3>llm course data extraction</h3></div>
       <p>async pipeline combining <b>several llms with browser automation</b> to extract structured course data — containerized &amp; deployed on gcp, with schedulini, a chat assistant students query in natural language.</p>
       <div class="chips"><span class="chip">langchain</span><span class="chip">asyncio</span><span class="chip">docker</span><span class="chip">gcp</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card wide rv" href="https://github.com/05nuha/Bin_Packing_Problem" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>05nuha.github.io/Bin_Packing_Problem</span></div><div class="shot"><img src="assets/prev-binpack.jpg" alt="05nuha.github.io/Bin_Packing_Problem interface preview" loading="lazy"></div></div>
       <div class="card-top"><span class="ico">📦</span><h3>algorithm visualizers</h3></div>
       <p>zero-dependency interactive teaching tools: <b>bin packing</b> with an np-completeness proof &amp; waste heatmaps, and a <b>dfs / topological sort</b> explorer — each a single html file, no libraries.</p>
       <div class="chips"><span class="chip">vanilla js</span><span class="chip">svg</span><span class="chip">algorithms</span></div>
@@ -451,24 +484,34 @@ footer .heart{color:var(--pink)}
   <div class="sec-head rv" style="margin-top:46px"><h2><span class="hash">#</span>collaborations</h2><div class="rule"></div><span class="num">02.5 · built with friends</span></div>
   <div class="grid">
     <a class="card rv" href="https://github.com/sudofixit/kashf-" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>kashf — diagnostics console</span></div><div class="shot"><img src="assets/prev-kashf.jpg" alt="kashf — diagnostics console interface preview" loading="lazy"></div></div>
       <div class="card-top"><span class="ico">🚦</span><h3>kashf (كشف)</h3><span class="win">team of 2</span></div>
       <p>traffic root-cause diagnostics console for an <b>rta (dubai roads authority) challenge</b> — walks operators through congestion diagnosis &amp; "what-if" fix simulation, honest about its model's limits.</p>
       <div class="chips"><span class="chip">data viz</span><span class="chip">simulation</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/sudofixit/rta-task" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>datasets/corridor_hourly.csv</span></div><pre>ts, corridor, veh_vol, los, ramadan, weekend
+2024-04-16 08:00, <span class="lv">SZR</span>, 11842, <span class="pk">F</span>, 1, 0
+26,304 hrs × 18 corridors · <span class="g">0 real personal records</span></pre></div>
       <div class="card-top"><span class="ico">🛣️</span><h3>rta-inspired mobility dataset</h3><span class="win">team of 2</span></div>
       <p>3 years of hourly <b>synthetic dubai traffic data</b> engineered to be statistically realistic — rush hours, uae weekends, ramadan patterns — with zero real personal data. built for the cud × rta 4ir mobility lab.</p>
       <div class="chips"><span class="chip">synthetic data</span><span class="chip">privacy</span><span class="chip">python</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/Maryammohd09/File_Monitoring_and_BackUp_System" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>./monitor — bcs323</span></div><pre>[parent] scan: <span class="g">14 .txt files</span> → shared memory
+[child]  backup/ written (14) · report.txt logged
+[SIGINT] <span class="pk">cleaning shm…</span> <span class="g">done ✓</span></pre></div>
       <div class="card-top"><span class="ico">🗂️</span><h3>file monitoring &amp; backup</h3></div>
       <p>linux <b>multi-process monitoring system in c</b> — fork(), shared memory between scanner &amp; backup processes, signal handling for clean teardown. systems-level programming coursework.</p>
       <div class="chips"><span class="chip">c</span><span class="chip">linux</span><span class="chip">ipc</span></div>
       <span class="go">view source →</span>
     </a>
     <a class="card rv" href="https://github.com/MahnourAslam/TruReach" target="_blank" rel="noopener">
+      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>oriane api — delivery check</span></div><pre>[video] 3 posts fetched · views <span class="g">2.3k verified</span>
+[contract] deliverables matched <span class="g">3/3 ✓</span>
+[insight] hook style B <span class="pk">+41% retention</span></pre></div>
       <div class="card-top"><span class="ico">📈</span><h3>truereach</h3><span class="win">hackathon mvp</span></div>
       <p>creator-marketing analytics — <b>video intelligence</b> that verifies what a brand deal actually delivered and learns what performs, beyond vanity metrics.</p>
       <div class="chips"><span class="chip">react</span><span class="chip">typescript</span><span class="chip">express</span></div>
