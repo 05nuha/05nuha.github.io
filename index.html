@@ -7,677 +7,581 @@
 <meta name="description" content="Final-year cybersecurity student in Dubai building AI security tooling — LLM guardrails, risk-framework mapping, content forensics.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Fraunces:ital,opsz,wght@1,9..144,300;1,9..144,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,300;0,400;0,500;0,700;1,400&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='80' font-size='80'>🌸</text></svg>">
 <style>
 :root{
-  --bg:#0b0710;
-  --bg2:#120b1a;
-  --panel:#160e20;
-  --line:rgba(255,139,184,.14);
-  --line2:rgba(255,139,184,.3);
-  --pink:#ff8bb8;
-  --pink-hi:#ffb3d1;
-  --pink-dim:#b86a8e;
+  --bg:#0a0a0c;
+  --bg2:#101014;
+  --panel:#15151b;
+  --line:rgba(255,255,255,.1);
+  --pink:#ff6fa5;
+  --pink-hi:#ffa8c7;
   --lav:#c9a6ff;
   --mint:#9ef0d2;
-  --txt:#f3e9f0;
-  --dim:#9d8ba0;
+  --txt:#f5f2f4;
+  --dim:#a6a0a8;
+  --lightbg:#faf7f9;
+  --lighttxt:#17131a;
+  --lightdim:#5c5560;
+  --chipbg:#17131a;
+  --chiptx:#fff;
   --mono:'JetBrains Mono',ui-monospace,monospace;
-  --serif:'Fraunces',serif;
+  --sans:'Inter',system-ui,sans-serif;
+}
+:root[data-theme="light"]{
+  --bg:#f6f3f5;
+  --bg2:#fff;
+  --panel:#fff;
+  --line:rgba(23,19,26,.12);
+  --txt:#17131a;
+  --dim:#5c5560;
+  --lightbg:#fff;
+  --chipbg:#17131a;
 }
 *{margin:0;padding:0;box-sizing:border-box}
 html{scroll-behavior:smooth}
-section,header{scroll-margin-top:64px}
-body{
-  background:var(--bg);color:var(--txt);font-family:var(--mono);
-  font-size:15px;line-height:1.7;overflow-x:hidden;
-}
-::selection{background:var(--pink);color:#1a0a12}
+section{scroll-margin-top:64px}
+body{background:var(--bg);color:var(--txt);font-family:var(--sans);font-size:15.5px;line-height:1.7}
+::selection{background:var(--pink);color:#23060f}
+img{max-width:100%;display:block}
+.wrap{max-width:1150px;margin:0 auto;padding:0 28px}
 
-/* background texture */
-body::before{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:
-    radial-gradient(ellipse 60% 45% at 75% -5%, rgba(255,139,184,.13), transparent 60%),
-    radial-gradient(ellipse 50% 40% at 10% 100%, rgba(201,166,255,.09), transparent 60%);
-}
-body::after{
-  content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.5;
-  background-image:
-    linear-gradient(rgba(255,139,184,.03) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255,139,184,.03) 1px, transparent 1px);
-  background-size:44px 44px;
-  mask-image:radial-gradient(ellipse 80% 70% at 50% 20%, #000 20%, transparent 80%);
-}
-.wrap{position:relative;z-index:1;max-width:980px;margin:0 auto;padding:0 24px}
+/* ───────── nav ───────── */
+nav{position:fixed;top:0;left:0;right:0;z-index:30;display:flex;align-items:center;
+  padding:10px 22px;background:transparent;transition:background .3s, box-shadow .3s}
+nav.scrolled{background:var(--bg2);box-shadow:0 2px 18px rgba(0,0,0,.25)}
+nav:not(.scrolled) .nav-links a,nav:not(.scrolled) #theme-btn{color:#f5f2f4}
+#theme-btn{width:38px;height:38px;border-radius:50%;border:none;cursor:pointer;font-size:17px;
+  background:transparent;color:var(--txt);display:grid;place-items:center}
+#theme-btn:hover{background:rgba(255,111,165,.14)}
+.nav-links{margin-left:auto;display:flex;gap:4px}
+.nav-links a{color:var(--txt);text-decoration:none;font-size:13.5px;font-weight:600;
+  padding:8px 13px;border-radius:7px;font-family:var(--mono)}
+.nav-links a:hover{color:var(--pink);background:rgba(255,111,165,.1)}
 
-/* nav */
-#progress{
-  position:fixed;top:0;left:0;height:3px;width:0;z-index:40;
-  background:linear-gradient(90deg,var(--pink),var(--lav));
-  box-shadow:0 0 12px rgba(255,139,184,.6);
-}
-nav{
-  position:sticky;top:0;z-index:10;backdrop-filter:blur(14px);
-  background:rgba(11,7,16,.5);border-bottom:1px solid transparent;
-  transition:background .3s,border-color .3s;
-}
-nav.scrolled{background:rgba(11,7,16,.82);border-bottom-color:var(--line)}
-.nav-links a.active{color:var(--pink-hi)}
-.nav-links a.active::before{opacity:1}
-.nav-in{max-width:980px;margin:0 auto;padding:14px 24px;display:flex;align-items:center;gap:20px}
-.logo{color:var(--pink);font-weight:700;text-decoration:none;letter-spacing:.04em}
-.logo .tld{color:var(--dim);font-weight:300}
-.nav-links{margin-left:auto;display:flex;gap:22px}
-.nav-links a{color:var(--dim);text-decoration:none;font-size:13px;transition:color .2s}
-.nav-links a:hover{color:var(--pink-hi)}
-.nav-links a::before{content:"./";color:var(--pink-dim);opacity:0;transition:opacity .2s}
-.nav-links a:hover::before{opacity:1}
-
-/* hero */
-header{min-height:100svh;display:flex;flex-direction:column;justify-content:center;padding:90px 0 60px;position:relative}
-.prompt-line{color:var(--dim);font-size:13px;margin-bottom:18px}
-.prompt-line .u{color:var(--mint)}
-.prompt-line .p{color:var(--lav)}
-h1{
-  font-size:clamp(36px,6.5vw,72px);font-weight:500;letter-spacing:-.02em;line-height:1.12;
-  margin-bottom:8px;
-}
-h1 .accent{
-  font-family:var(--serif);font-style:italic;font-weight:300;color:var(--pink);
-  text-shadow:0 0 28px rgba(255,139,184,.45);
-}
-.typed-wrap{min-height:32px;margin:18px 0 34px;font-size:clamp(15px,2.4vw,19px);color:var(--dim)}
+/* ───────── hero ───────── */
+.hero{position:relative;overflow:hidden;background:#0a0a0c;color:#f5f2f4;
+  padding:120px 28px 90px;text-align:center}
+.hero svg.wave{position:absolute;top:-40px;right:-120px;width:960px;height:480px;
+  pointer-events:none;opacity:.95}
+@media (max-width:760px){.hero svg.wave{right:-320px;opacity:.6}}
+.hero-inner{position:relative;max-width:720px;margin:0 auto}
+.avatar{width:96px;height:96px;border-radius:50%;margin:0 auto 4px;display:grid;place-items:center;
+  font-family:var(--mono);font-size:34px;font-weight:700;color:#23060f;
+  background:linear-gradient(135deg,var(--pink-hi),var(--pink) 55%,var(--lav));
+  box-shadow:0 0 0 4px rgba(255,255,255,.08), 0 0 44px rgba(255,111,165,.45)}
+.hero .socials{display:flex;gap:16px;justify-content:center;margin:16px 0 6px}
+.hero .socials a{color:#f5f2f4;opacity:.85}
+.hero .socials a:hover{opacity:1;color:var(--pink-hi)}
+.hero .socials svg{width:22px;height:22px;fill:currentColor}
+.hero h1{font-size:clamp(34px,6vw,54px);font-weight:800;letter-spacing:-.02em}
+.hero h1 .dot{color:var(--pink)}
+.hero .sub{font-family:var(--mono);font-size:clamp(13px,2.2vw,16px);color:#cfc8d2;margin-top:10px;min-height:26px}
 .typed::after{content:"▌";color:var(--pink);animation:blink 1s step-end infinite}
 @keyframes blink{50%{opacity:0}}
-.hero-tags{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:44px}
-.tag{
-  font-size:12px;padding:5px 12px;border:1px solid var(--line2);border-radius:999px;
-  color:var(--pink-hi);background:rgba(255,139,184,.06);
-}
-.cta-row{display:flex;gap:14px;flex-wrap:wrap}
-.btn{
-  display:inline-block;padding:11px 22px;border-radius:8px;text-decoration:none;
-  font-size:13.5px;font-weight:500;letter-spacing:.02em;transition:all .22s;
-}
-.btn-solid{background:var(--pink);color:#23060f;box-shadow:0 0 24px rgba(255,139,184,.35)}
-.btn-solid:hover{background:var(--pink-hi);box-shadow:0 0 38px rgba(255,139,184,.55);transform:translateY(-1px)}
-.btn-ghost{border:1px solid var(--line2);color:var(--pink-hi)}
-.btn-ghost:hover{background:rgba(255,139,184,.08);border-color:var(--pink)}
 
-/* hero orbit art */
-.hero-art{
-  position:absolute;right:2%;top:50%;width:380px;height:380px;margin-top:-190px;
-  pointer-events:none;z-index:0;opacity:.85;
-}
-header>*:not(.hero-art){position:relative;z-index:1}
-.ring{position:absolute;inset:0;border:1px dashed rgba(255,139,184,.25);border-radius:50%;
-  animation:spin 40s linear infinite}
-.ring.r2{inset:52px;border-color:rgba(201,166,255,.22);animation-duration:28s;animation-direction:reverse}
-.ring.r3{inset:110px;border-style:solid;border-color:rgba(255,139,184,.12);animation:none}
-.ring .sat{position:absolute;top:-13px;left:50%;margin-left:-13px;width:26px;height:26px;border-radius:50%;
-  display:grid;place-items:center;font-size:13px;background:var(--panel);border:1px solid var(--line2);
-  box-shadow:0 0 14px rgba(255,139,184,.3)}
-.orb{position:absolute;inset:135px;border-radius:50%;display:grid;place-items:center;font-size:44px;
-  background:radial-gradient(circle at 36% 32%, rgba(255,179,209,.35), rgba(255,139,184,.12) 55%, transparent 75%);
-  border:1px solid var(--line2);
-  box-shadow:0 0 70px rgba(255,139,184,.3), inset 0 0 36px rgba(255,139,184,.12);
-  animation:bob 5.5s ease-in-out infinite}
-@keyframes spin{to{transform:rotate(360deg)}}
-@keyframes bob{0%,100%{transform:translateY(-7px)}50%{transform:translateY(7px)}}
-@media (max-width:1100px){.hero-art{display:none}}
-
-/* scroll indicator */
-.scroll-cue{position:absolute;left:50%;bottom:30px;transform:translateX(-50%);
-  width:26px;height:44px;border:2px solid var(--line2);border-radius:14px;display:flex;justify-content:center}
-.scroll-cue i{width:4px;height:9px;border-radius:2px;background:var(--pink);margin-top:7px;
-  animation:cue 1.6s ease-in-out infinite}
-@keyframes cue{0%{opacity:1;transform:translateY(0)}70%{opacity:0;transform:translateY(16px)}100%{opacity:0}}
-
-/* sections */
-section{padding:clamp(90px,11vh,140px) 0}
-.sec-head{display:flex;flex-direction:column;gap:10px;margin-bottom:56px}
-.sec-head h2{font-size:clamp(26px,4vw,38px);font-weight:600;letter-spacing:-.01em;order:2}
-.sec-head h2 .hash{color:var(--pink);margin-right:8px}
-.sec-head .rule{order:3;width:64px;height:3px;border-radius:2px;margin-top:4px;
-  background:linear-gradient(90deg,var(--pink),transparent)}
-.sec-head .num{order:1;font-size:12px;color:var(--pink-dim);letter-spacing:.3em;text-transform:uppercase}
-
-/* terminal card (about) */
-.term{
-  max-width:860px;
-  border:1px solid var(--line2);border-radius:12px;overflow:hidden;background:var(--panel);
-  box-shadow:0 18px 60px rgba(0,0,0,.45), 0 0 0 1px rgba(255,139,184,.04), 0 0 46px rgba(255,139,184,.07);
-}
-.term-bar{
-  display:flex;align-items:center;gap:8px;padding:11px 16px;
-  background:rgba(255,139,184,.06);border-bottom:1px solid var(--line);
-}
-.dot{width:11px;height:11px;border-radius:50%}
-.d1{background:#ff7aa8}.d2{background:#ffc2d9}.d3{background:#c9a6ff}
-.term-title{margin-left:8px;font-size:12px;color:var(--dim)}
-.term-body{padding:26px 26px 30px;font-size:14px}
-.term-body .ln{display:block;margin-bottom:4px}
-.term-body .cm{color:var(--pink-dim);font-style:italic}
-.term-body .k{color:var(--lav)}
-.term-body .s{color:var(--mint)}
-.term-body p{color:var(--txt);margin:14px 0;max-width:62ch}
-.term-body p b{color:var(--pink-hi);font-weight:500}
-
-/* guardrail game */
-.game{
-  border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:#140c1d;
-  box-shadow:0 18px 60px rgba(0,0,0,.45), 0 0 46px rgba(255,139,184,.07);
-}
-.game-chat{padding:20px 22px;height:320px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
-.msg{max-width:82%;padding:10px 15px;border-radius:12px;font-size:13.5px;line-height:1.6;white-space:pre-wrap}
-.msg.bot{align-self:flex-start;background:rgba(255,139,184,.08);border:1px solid var(--line);border-bottom-left-radius:4px}
-.msg.bot .det{display:block;margin-top:6px;font-size:11px;color:var(--lav);letter-spacing:.04em}
-.msg.user{align-self:flex-end;background:rgba(201,166,255,.1);border:1px solid rgba(201,166,255,.2);border-bottom-right-radius:4px;color:var(--txt)}
-.msg.win{background:rgba(158,240,210,.08);border-color:rgba(158,240,210,.35)}
-.msg.win .flag{color:var(--mint);font-weight:700;letter-spacing:.03em}
-.game-in{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
-.game-in input{
-  flex:1;background:rgba(255,139,184,.04);border:1px solid var(--line);border-radius:8px;
-  padding:10px 14px;color:var(--txt);font-family:var(--mono);font-size:13.5px;outline:none;
-  caret-color:var(--pink);transition:border-color .2s;
-}
-.game-in input:focus{border-color:var(--line2)}
-.game-in button{
-  padding:10px 20px;border:none;border-radius:8px;background:var(--pink);color:#23060f;
-  font-family:var(--mono);font-size:13px;font-weight:600;cursor:pointer;transition:all .2s;
-}
-.game-in button:hover{background:var(--pink-hi);box-shadow:0 0 18px rgba(255,139,184,.4)}
-.game-note{font-size:12px;color:var(--dim);margin-top:14px}
-.game-note b{color:var(--pink-dim);font-weight:500}
-
-/* project previews */
-.card-prev{
-  border:1px solid var(--line);border-radius:10px;overflow:hidden;background:#0d0813;
-  margin-bottom:6px;
-}
-.prev-bar{display:flex;align-items:center;gap:5px;padding:7px 11px;border-bottom:1px solid var(--line);
-  background:rgba(255,139,184,.04)}
-.prev-bar b{width:8px;height:8px;border-radius:50%;background:rgba(255,139,184,.35)}
-.prev-bar span{margin-left:6px;font-size:10px;color:var(--dim);letter-spacing:.04em}
-.card-prev .shot{overflow:hidden;aspect-ratio:16/9.4}
-.card-prev img{display:block;width:100%;height:100%;object-fit:cover;object-position:top;
-  transition:transform .55s cubic-bezier(.2,.7,.2,1)}
-.card:hover .card-prev img{transform:scale(1.05)}
-.card-prev pre{margin:0;padding:16px 18px;aspect-ratio:16/9.4;overflow:hidden;display:flex;flex-direction:column;justify-content:center;
-  font-family:var(--mono);font-size:11.5px;line-height:2;color:var(--dim);white-space:pre-wrap}
-.card-prev pre .g{color:var(--mint)}
-.card-prev pre .pk{color:var(--pink-hi)}
-.card-prev pre .lv{color:var(--lav)}
-.card.wide .card-prev .shot,.card.wide .card-prev pre{aspect-ratio:21/8}
-
-/* projects */
-.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:26px}
-@media (max-width:700px){.grid{grid-template-columns:1fr}}
-.card{
-  position:relative;border:1px solid var(--line);border-radius:14px;padding:30px;
-  background:linear-gradient(160deg, rgba(255,139,184,.045), rgba(22,14,32,.6) 45%);
-  text-decoration:none;color:inherit;display:flex;flex-direction:column;gap:12px;
-  transition:transform .25s, border-color .25s, box-shadow .25s;
-}
-.card:hover{
-  transform:translateY(-4px);border-color:var(--line2);
-  box-shadow:0 16px 44px rgba(0,0,0,.5), 0 0 34px rgba(255,139,184,.14);
-}
-.card-top{display:flex;align-items:center;gap:10px}
-.card-top .ico{font-size:18px}
-.card h3{font-size:16px;font-weight:600;color:var(--pink-hi)}
-.card .win{
-  margin-left:auto;font-size:10.5px;letter-spacing:.06em;padding:3px 9px;border-radius:999px;
-  background:rgba(158,240,210,.1);color:var(--mint);border:1px solid rgba(158,240,210,.25);
-  white-space:nowrap;
-}
-.card p{font-size:13.5px;color:var(--dim);flex:1}
-.card p b{color:var(--txt);font-weight:500}
-.chips{display:flex;flex-wrap:wrap;gap:7px}
-.chip{font-size:11px;color:var(--lav);background:rgba(201,166,255,.08);
-  border:1px solid rgba(201,166,255,.18);padding:2.5px 9px;border-radius:5px}
-.card .go{font-size:12px;color:var(--pink);opacity:0;transform:translateX(-4px);transition:all .25s}
-.card:hover .go{opacity:1;transform:none}
-.card.wide{grid-column:1/-1}
-
-/* timeline (research & wins) */
-.tl{border-left:1px solid var(--line2);margin-left:6px;padding-left:34px;display:flex;flex-direction:column;gap:52px}
-.tl-item{position:relative}
-.tl-item::before{
-  content:"";position:absolute;left:-39.5px;top:7px;width:10px;height:10px;border-radius:50%;
-  background:var(--bg);border:2px solid var(--pink);box-shadow:0 0 12px rgba(255,139,184,.6);
-}
-.tl-item .when{font-size:11.5px;color:var(--pink-dim);letter-spacing:.08em;text-transform:uppercase}
-.tl-item.hot{border:1px solid var(--line2);border-radius:12px;padding:18px 20px;margin-left:-20px;
-  background:linear-gradient(160deg, rgba(255,139,184,.07), transparent 55%);
-  box-shadow:0 0 30px rgba(255,139,184,.08)}
-.tl-item.hot::before{left:-19.5px;top:25px}
-.tl-item h3{font-size:16px;font-weight:600;margin:4px 0 6px}
-.tl-item h3 a{color:var(--pink-hi);text-decoration:none;border-bottom:1px dashed var(--line2)}
-.tl-item h3 a:hover{color:var(--pink)}
-.tl-item p{color:var(--dim);font-size:13.5px;max-width:68ch}
-
-/* skills */
-.skills{display:flex;flex-direction:column;gap:18px}
-.skill-row{
-  display:flex;gap:18px;align-items:baseline;border:1px solid var(--line);border-radius:12px;
-  padding:22px 26px;background:var(--panel);flex-wrap:wrap;
-}
-.skill-row .lbl{
-  min-width:130px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--pink);
-  font-weight:600;
-}
-.skill-row .set{display:flex;flex-wrap:wrap;gap:8px;flex:1}
-.skill-row .set span{
-  font-size:12.5px;padding:4px 12px;border-radius:999px;color:var(--txt);
-  background:rgba(255,139,184,.06);border:1px solid var(--line);
-  transition:border-color .2s, background .2s;
-}
-.skill-row .set span:hover{border-color:var(--pink);background:rgba(255,139,184,.13)}
-.skill-row .set span.hot{color:var(--pink-hi);border-color:var(--line2);font-weight:500}
-
-/* certs */
-.cert-row{display:flex;gap:24px;flex-wrap:wrap}
-.cert{
-  flex:1;min-width:230px;border:1px solid var(--line);border-radius:12px;padding:20px 22px;
-  background:var(--panel);display:flex;gap:14px;align-items:center;
-}
-.cert .glyph{
-  width:42px;height:42px;border-radius:10px;display:grid;place-items:center;font-size:19px;
-  background:rgba(255,139,184,.1);border:1px solid var(--line2);
-}
-.cert b{display:block;font-size:14.5px;font-weight:600;color:var(--txt)}
-.cert span{font-size:12px;color:var(--dim)}
-
-/* contact */
-.contact{
-  text-align:center;padding:clamp(110px,18vh,190px) 0 90px;
-}
-.contact h2{font-size:clamp(26px,4.5vw,40px);font-weight:500;margin-bottom:10px}
-.contact h2 em{font-family:var(--serif);font-style:italic;font-weight:300;color:var(--pink);
-  text-shadow:0 0 26px rgba(255,139,184,.4)}
-.contact p{color:var(--dim);margin-bottom:28px}
-.contact .cta-row{justify-content:center}
-footer{
-  border-top:1px solid var(--line);padding:22px 0 30px;text-align:center;
-  color:var(--dim);font-size:12px;
-}
-footer .heart{color:var(--pink)}
-
-/* interactive terminal */
-#term-fab{
-  position:fixed;right:22px;bottom:22px;z-index:20;cursor:pointer;
-  font-family:var(--mono);font-size:13px;padding:11px 18px;border-radius:999px;
-  background:var(--panel);border:1px solid var(--line2);color:var(--pink-hi);
-  box-shadow:0 8px 30px rgba(0,0,0,.5), 0 0 22px rgba(255,139,184,.18);
-  transition:all .22s;
-}
-#term-fab:hover{background:rgba(255,139,184,.12);transform:translateY(-2px)}
-#term-overlay{
-  position:fixed;inset:0;z-index:30;display:none;align-items:center;justify-content:center;
-  background:rgba(11,7,16,.72);backdrop-filter:blur(6px);padding:20px;
-}
-#term-overlay.open{display:flex}
-.iterm{
-  width:min(640px,100%);max-height:72vh;display:flex;flex-direction:column;
-  border:1px solid var(--line2);border-radius:14px;overflow:hidden;background:#140c1d;
-  box-shadow:0 30px 90px rgba(0,0,0,.7), 0 0 60px rgba(255,139,184,.14);
-  animation:termin .22s ease;
-}
-@keyframes termin{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
-.iterm-out{padding:18px 20px;overflow-y:auto;font-size:13.5px;flex:1;min-height:200px}
-.iterm-out .o-cmd{color:var(--mint)}
-.iterm-out .o-cmd::before{content:"nuha@dxb:~$ ";color:var(--pink-dim)}
-.iterm-out .o-res{color:var(--txt);white-space:pre-wrap;margin:4px 0 14px}
-.iterm-out .o-res a{color:var(--pink);text-decoration:underline dashed}
-.iterm-out .o-res .hl{color:var(--pink-hi)}
-.iterm-in{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid var(--line)}
-.iterm-in .ps1{color:var(--pink-dim);font-size:13.5px;white-space:nowrap}
-.iterm-in input{
-  flex:1;background:none;border:none;outline:none;color:var(--mint);
-  font-family:var(--mono);font-size:13.5px;caret-color:var(--pink);
-}
-/* card tilt */
-.card{will-change:transform}
-@media (prefers-reduced-motion:reduce){
-  .rv{transition:none}
-  .typed::after{animation:none}
-}
-/* reveal on scroll */
-.rv{opacity:0;transform:translateY(18px);transition:opacity .6s ease,transform .6s ease}
+/* ───────── shared section bits ───────── */
+.sec{padding:clamp(70px,9vh,110px) 0}
+.sec h2{font-size:clamp(24px,3.4vw,32px);font-weight:800;letter-spacing:-.01em;margin-bottom:44px}
+.rv{opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s ease}
 .rv.in{opacity:1;transform:none}
 
-@media (max-width:640px){
-  .nav-links{gap:14px}
-  .nav-links a::before{display:none}
+/* ───────── expertise (light block) ───────── */
+#expertise{background:var(--lightbg);color:var(--lighttxt)}
+#expertise h2{color:var(--lighttxt)}
+.exp-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:46px}
+@media (max-width:900px){.exp-grid{grid-template-columns:1fr;gap:38px}}
+.exp .ico{font-size:30px;margin-bottom:14px}
+.exp h3{font-size:16.5px;font-weight:700;margin-bottom:10px}
+.exp p{font-size:14px;color:var(--lightdim);margin-bottom:14px}
+.exp .stack-lbl{font-family:var(--mono);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--lightdim);margin-bottom:9px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{font-family:var(--mono);font-size:11px;padding:4px 11px;border-radius:999px;
+  background:var(--chipbg);color:var(--chiptx)}
+.chip.alt{background:var(--pink);color:#23060f}
+
+/* ───────── career history timeline ───────── */
+#history{background:var(--bg)}
+.tl{position:relative;max-width:980px;margin:0 auto}
+.tl::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:3px;margin-left:-1.5px;
+  background:var(--line)}
+.tl-row{position:relative;width:50%;padding:0 44px 56px 0}
+.tl-row:nth-child(even){left:50%;padding:0 0 56px 44px}
+.tl-dot{position:absolute;top:4px;right:-21px;width:42px;height:42px;border-radius:50%;
+  display:grid;place-items:center;font-size:17px;z-index:1;
+  background:linear-gradient(135deg,var(--pink),var(--lav));color:#23060f;
+  box-shadow:0 0 0 4px var(--bg), 0 0 22px rgba(255,111,165,.4)}
+.tl-row:nth-child(even) .tl-dot{right:auto;left:-21px}
+.tl-card{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:22px 24px;
+  box-shadow:0 10px 34px rgba(0,0,0,.22)}
+.tl-card .when{font-family:var(--mono);font-size:11.5px;color:var(--pink);letter-spacing:.08em;text-transform:uppercase}
+.tl-card h3{font-size:16px;font-weight:700;margin:6px 0 2px}
+.tl-card h4{font-size:13px;font-weight:500;color:var(--dim);margin-bottom:8px}
+.tl-card p{font-size:13.5px;color:var(--dim)}
+@media (max-width:760px){
+  .tl::before{left:20px}
+  .tl-row,.tl-row:nth-child(even){width:100%;left:0;padding:0 0 46px 58px}
+  .tl-dot,.tl-row:nth-child(even) .tl-dot{left:0;right:auto}
 }
+
+/* ───────── projects ───────── */
+#projects{background:var(--bg)}
+.proj-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:54px 46px}
+@media (max-width:820px){.proj-grid{grid-template-columns:1fr}}
+.proj{text-decoration:none;color:inherit;display:block}
+.thumb{border-radius:14px;overflow:hidden;border:1px solid var(--line);background:var(--panel);
+  aspect-ratio:16/10;margin-bottom:18px;position:relative;
+  transition:transform .3s, box-shadow .3s}
+.proj:hover .thumb{transform:translateY(-5px);box-shadow:0 18px 44px rgba(0,0,0,.35), 0 0 34px rgba(255,111,165,.15)}
+.thumb img{width:100%;height:100%;object-fit:cover;object-position:top}
+.thumb pre{height:100%;display:flex;flex-direction:column;justify-content:center;
+  padding:22px 24px;font-family:var(--mono);font-size:12px;line-height:2.1;color:var(--dim);
+  white-space:pre-wrap;background:
+  radial-gradient(ellipse 90% 70% at 20% 0%, rgba(255,111,165,.12), transparent 60%),var(--panel)}
+.thumb pre .g{color:var(--mint)}.thumb pre .pk{color:var(--pink)}.thumb pre .lv{color:var(--lav)}
+.badge{position:absolute;top:12px;right:12px;font-family:var(--mono);font-size:10.5px;letter-spacing:.05em;
+  padding:4px 11px;border-radius:999px;background:rgba(10,10,12,.78);color:var(--pink-hi);
+  border:1px solid rgba(255,111,165,.4);backdrop-filter:blur(4px)}
+.proj h3{font-size:17.5px;font-weight:700;margin-bottom:8px}
+.proj h3 .ar{font-family:var(--mono);font-weight:400;color:var(--dim);font-size:14px}
+.proj p{font-size:14px;color:var(--dim)}
+.proj p b{color:var(--txt);font-weight:600}
+
+/* ───────── guardrail game ───────── */
+#game{background:var(--bg)}
+#game .note{font-size:13px;color:var(--dim);margin-top:16px}
+#game .note a{color:var(--pink)}
+.game-box{max-width:760px;border:1px solid var(--line);border-radius:14px;overflow:hidden;background:var(--panel)}
+.game-bar{display:flex;gap:7px;align-items:center;padding:11px 16px;border-bottom:1px solid var(--line)}
+.game-bar b{width:11px;height:11px;border-radius:50%}
+.game-bar b:nth-child(1){background:#ff7aa8}.game-bar b:nth-child(2){background:#ffc2d9}.game-bar b:nth-child(3){background:#c9a6ff}
+.game-bar span{margin-left:8px;font-family:var(--mono);font-size:12px;color:var(--dim)}
+.game-chat{padding:20px 22px;height:300px;overflow-y:auto;display:flex;flex-direction:column;gap:12px}
+.msg{max-width:84%;padding:10px 15px;border-radius:12px;font-size:13.5px;line-height:1.6;
+  font-family:var(--mono);white-space:pre-wrap}
+.msg.bot{align-self:flex-start;background:rgba(255,111,165,.09);border:1px solid var(--line);border-bottom-left-radius:4px}
+.msg.bot .det{display:block;margin-top:6px;font-size:11px;color:var(--lav)}
+.msg.user{align-self:flex-end;background:rgba(201,166,255,.12);border:1px solid var(--line);border-bottom-right-radius:4px}
+.msg.win{background:rgba(158,240,210,.1);border-color:rgba(158,240,210,.4)}
+.msg.win .flag{color:var(--mint);font-weight:700}
+.game-in{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--line)}
+.game-in input{flex:1;background:transparent;border:1px solid var(--line);border-radius:8px;
+  padding:10px 14px;color:var(--txt);font-family:var(--mono);font-size:13.5px;outline:none;caret-color:var(--pink)}
+.game-in input:focus{border-color:var(--pink)}
+.game-in button{padding:10px 22px;border:none;border-radius:8px;background:var(--pink);color:#23060f;
+  font-family:var(--mono);font-size:13px;font-weight:700;cursor:pointer}
+.game-in button:hover{background:var(--pink-hi)}
+
+/* ───────── contact ───────── */
+#contact{background:var(--bg)}
+#contact .lead{color:var(--dim);margin:-28px 0 34px;font-size:15px}
+form{max-width:980px}
+.frow{display:flex;gap:18px;margin-bottom:18px}
+@media (max-width:700px){.frow{flex-direction:column}}
+.fin{flex:1;background:var(--panel);border:1px solid var(--line);border-radius:9px;
+  padding:14px 16px;color:var(--txt);font-family:var(--sans);font-size:14px;outline:none;width:100%}
+.fin:focus{border-color:var(--pink)}
+textarea.fin{min-height:150px;resize:vertical}
+.send{display:flex;justify-content:flex-end;margin-top:18px}
+.send button{padding:12px 34px;border:none;border-radius:8px;cursor:pointer;
+  background:var(--pink);color:#23060f;font-family:var(--mono);font-size:14px;font-weight:700;
+  box-shadow:0 0 24px rgba(255,111,165,.3)}
+.send button:hover{background:var(--pink-hi)}
+
+/* ───────── footer ───────── */
+footer{background:#0a0a0c;color:#cfc8d2;text-align:center;padding:44px 20px}
+footer .socials{display:flex;gap:16px;justify-content:center;margin-bottom:14px}
+footer .socials a{color:#cfc8d2}
+footer .socials a:hover{color:var(--pink-hi)}
+footer .socials svg{width:20px;height:20px;fill:currentColor}
+footer p{font-size:13px}
+footer .heart{color:var(--pink)}
+
+/* terminal easter egg (kept) */
+#term-fab{position:fixed;right:22px;bottom:22px;z-index:25;cursor:pointer;
+  font-family:var(--mono);font-size:13px;padding:11px 18px;border-radius:999px;
+  background:var(--panel);border:1px solid var(--line);color:var(--pink);
+  box-shadow:0 8px 30px rgba(0,0,0,.4)}
+#term-fab:hover{background:rgba(255,111,165,.12)}
+#term-overlay{position:fixed;inset:0;z-index:40;display:none;align-items:center;justify-content:center;
+  background:rgba(5,5,8,.72);backdrop-filter:blur(6px);padding:20px}
+#term-overlay.open{display:flex}
+.iterm{width:min(640px,100%);max-height:72vh;display:flex;flex-direction:column;
+  border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#121018;color:#f5f2f4;
+  box-shadow:0 30px 90px rgba(0,0,0,.7)}
+.iterm-out{padding:18px 20px;overflow-y:auto;font-family:var(--mono);font-size:13.5px;flex:1;min-height:200px}
+.iterm-out .o-cmd{color:var(--mint)}
+.iterm-out .o-cmd::before{content:"nuha@dxb:~$ ";color:var(--pink)}
+.iterm-out .o-res{white-space:pre-wrap;margin:4px 0 14px}
+.iterm-out .o-res a{color:var(--pink)}
+.iterm-out .o-res .hl{color:var(--pink-hi)}
+.iterm-in{display:flex;align-items:center;gap:8px;padding:12px 20px;border-top:1px solid var(--line)}
+.iterm-in .ps1{color:var(--pink);font-family:var(--mono);font-size:13.5px;white-space:nowrap}
+.iterm-in input{flex:1;background:none;border:none;outline:none;color:var(--mint);
+  font-family:var(--mono);font-size:13.5px;caret-color:var(--pink)}
+
+#progress{position:fixed;top:0;left:0;height:3px;width:0;z-index:50;
+  background:linear-gradient(90deg,var(--pink),var(--lav));box-shadow:0 0 12px rgba(255,111,165,.6)}
+@media (prefers-reduced-motion:reduce){.rv{transition:none}.typed::after{animation:none}}
 </style>
 </head>
 <body>
 
 <div id="progress"></div>
 <nav id="topnav">
-  <div class="nav-in">
-    <a class="logo" href="#">nuha<span class="tld">.sec</span></a>
-    <div class="nav-links">
-      <a href="#about">about</a>
-      <a href="#projects">projects</a>
-      <a href="#research">research</a>
-      <a href="#contact">contact</a>
-    </div>
+  <button id="theme-btn" aria-label="toggle theme">☾</button>
+  <div class="nav-links">
+    <a href="#expertise">expertise</a>
+    <a href="#history">history</a>
+    <a href="#projects">projects</a>
+    <a href="#contact">contact</a>
   </div>
 </nav>
 
-<header class="wrap">
-  <div class="prompt-line"><span class="u">nuha@dxb</span>:<span class="p">~</span>$ whoami</div>
-  <h1>securing <span class="accent">ai systems,</span><br>one prompt at a time</h1>
-  <div class="typed-wrap"><span class="typed" id="typed"></span></div>
-  <div class="hero-tags">
-    <span class="tag">🌸 ai security</span>
-    <span class="tag">llm guardrails</span>
-    <span class="tag">mitre atlas · owasp llm</span>
-    <span class="tag">📍 dubai</span>
+<!-- ───────── hero ───────── -->
+<header class="hero">
+  <svg class="wave" viewBox="0 0 960 480" aria-hidden="true" id="wave"></svg>
+  <div class="hero-inner">
+    <div class="avatar">n🌸</div>
+    <div class="socials">
+      <a href="https://github.com/05nuha" target="_blank" rel="noopener" aria-label="github">
+        <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+      </a>
+      <a href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener" aria-label="linkedin">
+        <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.11-4 0v5.6h-3v-11h3v1.77c1.4-2.59 7-2.78 7 2.47v6.76z"/></svg>
+      </a>
+    </div>
+    <h1>nuha aburamadan<span class="dot">.</span></h1>
+    <div class="sub"><span class="typed" id="typed"></span></div>
   </div>
-  <div class="cta-row">
-    <a class="btn btn-solid" href="#projects">see my work ↓</a>
-    <a class="btn btn-ghost" href="https://github.com/05nuha" target="_blank" rel="noopener">github</a>
-    <a class="btn btn-ghost" href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener">linkedin</a>
-  </div>
-  <div class="hero-art" aria-hidden="true">
-    <div class="ring"><span class="sat">🔐</span></div>
-    <div class="ring r2"><span class="sat">🌸</span></div>
-    <div class="ring r3"></div>
-    <div class="orb">🛡️</div>
-  </div>
-  <a class="scroll-cue" href="#about" aria-label="scroll down"><i></i></a>
 </header>
 
-<section id="about" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>about</h2><div class="rule"></div><span class="num">01 · introduction</span></div>
-  <div class="term rv">
-    <div class="term-bar">
-      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
-      <span class="term-title">nuha@dxb: ~/about — cat readme.md</span>
-    </div>
-    <div class="term-body">
-      <span class="ln cm"># final-year cybersecurity student @ canadian university dubai · gpa 3.8/4.0</span>
-      <p>i work on the <b>security of llm systems</b>: built a prompt-injection &amp; hallucination classifier at <b>qcri</b>, an open-source llm risk-assessment pipeline, and co-authored research showing clean-benchmark accuracy overstates the robustness of ml security systems. currently an <b>ai security consultant intern at cpx (g42 group)</b>, mapping llm risks to owasp llm top 10, mitre atlas &amp; uae data-protection law for enterprise clients.</p>
-      <p>my work lives where <b>regulation meets machine learning</b> — and i'm headed from security engineering toward <b>empirical ai security research</b>.</p>
-      <span class="ln"><span class="k">stack</span> = [<span class="s">"python"</span>, <span class="s">"fastapi"</span>, <span class="s">"azure openai"</span>, <span class="s">"langchain"</span>, <span class="s">"docker"</span>, <span class="s">"gcp"</span>]</span>
-      <span class="ln"><span class="k">languages</span> = [<span class="s">"english"</span>, <span class="s">"arabic (native)"</span>] <span class="cm"># 🇨🇦 canadian citizen · 📍 dubai</span></span>
+<!-- ───────── expertise ───────── -->
+<section id="expertise" class="sec">
+  <div class="wrap">
+    <h2 class="rv">expertise</h2>
+    <div class="exp-grid">
+      <div class="exp rv">
+        <div class="ico">🛡️</div>
+        <h3>ai security &amp; llm guardrails</h3>
+        <p>i build the tooling that keeps ai systems honest: prompt-injection &amp; hallucination classifiers, pii-redaction guardrail pipelines, and risk mapping to mitre atlas, owasp llm top 10 &amp; nist ai rmf. built at qcri, applied daily at cpx (g42 group).</p>
+        <div class="stack-lbl">tech stack</div>
+        <div class="chips"><span class="chip alt">azure openai</span><span class="chip">groq</span><span class="chip">mitre atlas</span><span class="chip">owasp llm</span><span class="chip">nist ai rmf</span></div>
+      </div>
+      <div class="exp rv">
+        <div class="ico">🔬</div>
+        <h3>security research &amp; compliance</h3>
+        <p>first-author research on adversarial robustness &amp; xai security, uae pdpl compliance engineering, and content forensics that tell a real government announcement from a doctored one. security+ and sc-900 certified.</p>
+        <div class="stack-lbl">focus</div>
+        <div class="chips"><span class="chip alt">adversarial ml</span><span class="chip">xai attacks</span><span class="chip">uae pdpl</span><span class="chip">security+</span><span class="chip">sc-900</span></div>
+      </div>
+      <div class="exp rv">
+        <div class="ico">⚙️</div>
+        <h3>full-stack engineering</h3>
+        <p>fluent python; i ship end to end — fastapi &amp; flask backends, react dashboards, async llm pipelines with browser automation, containerized and deployed on gcp &amp; vercel. arabic-first products included.</p>
+        <div class="stack-lbl">tech stack</div>
+        <div class="chips"><span class="chip alt">python</span><span class="chip">fastapi</span><span class="chip">react</span><span class="chip">docker</span><span class="chip">gcp</span><span class="chip">mongodb</span><span class="chip">postgres</span></div>
+      </div>
     </div>
   </div>
 </section>
 
-<section id="game" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>can you break my guardrail?</h2><div class="rule"></div><span class="num">01.5 · play the attacker</span></div>
-  <div class="game rv">
-    <div class="term-bar">
-      <span class="dot d1"></span><span class="dot d2"></span><span class="dot d3"></span>
-      <span class="term-title">guarded-bot v1.0 — protecting one (1) flag</span>
-    </div>
-    <div class="game-chat" id="game-chat"></div>
-    <div class="game-in">
-      <input id="game-in" placeholder="try to make me leak the flag…" autocomplete="off" spellcheck="false" aria-label="attack prompt">
-      <button id="game-send">inject</button>
+<!-- ───────── career history ───────── -->
+<section id="history" class="sec">
+  <div class="wrap">
+    <h2 class="rv">career history</h2>
+    <div class="tl">
+      <div class="tl-row rv"><span class="tl-dot">💼</span>
+        <div class="tl-card">
+          <span class="when">aug 2026 — present</span>
+          <h3>ai security consultant intern</h3><h4>cpx (g42 group) · dubai</h4>
+          <p>ai security documentation for enterprise clients — mapping llm risks to owasp llm top 10, mitre atlas &amp; uae data-protection law — plus awareness sessions for non-technical teams.</p>
+        </div>
+      </div>
+      <div class="tl-row rv"><span class="tl-dot">📄</span>
+        <div class="tl-card">
+          <span class="when">2026 · forthcoming, caisais · first author</span>
+          <h3>a three-pillar framework</h3><h4>adversarial robustness · xai security · regulatory compliance</h4>
+          <p>position paper: intrusion-detection models reporting 95–99% clean accuracy fall to 63–83% under small perturbations; shap/lime explanations are an attack surface, not only a safeguard.</p>
+        </div>
+      </div>
+      <div class="tl-row rv"><span class="tl-dot">🏆</span>
+        <div class="tl-card">
+          <span class="when">nov 2026 · hct dubai</span>
+          <h3>uae hackathon 2026 — pioneers track</h3><h4>challenge 40 · "building trust in digital content"</h4>
+          <p>built haqeeq in 72 hours: live arabic whatsapp verification bot + national trust dashboard for the uae cyber security council / tdra / desc challenge.</p>
+        </div>
+      </div>
+      <div class="tl-row rv"><span class="tl-dot">🥇</span>
+        <div class="tl-card">
+          <span class="when">feb 2026 · uob dubai</span>
+          <h3>1st place — jetbrains bounty</h3><h4>inter-university hackathon</h4>
+          <p>won the jetbrains "help the developer" challenge with devcare, a biometric wellness plugin for intellij idea.</p>
+        </div>
+      </div>
+      <div class="tl-row rv"><span class="tl-dot">🔬</span>
+        <div class="tl-card">
+          <span class="when">may — aug 2025</span>
+          <h3>cybersecurity research intern</h3><h4>qatar computing research institute · doha</h4>
+          <p>designed &amp; built a prompt-injection and hallucination classifier on azure openai, each detection mapped to mitre atlas &amp; owasp llm top 10 — owned end to end through open-source release.</p>
+        </div>
+      </div>
+      <div class="tl-row rv"><span class="tl-dot">📚</span>
+        <div class="tl-card">
+          <span class="when">published · aiet 2025 · germany</span>
+          <h3>automated learning path recommender</h3><h4>international conference publication</h4>
+          <p>co-authored recommendation system — flask/mongodb backend over 100k+ wikipedia clickstream records, evaluated with llm-generated judge personas.</p>
+        </div>
+      </div>
+      <div class="tl-row rv"><span class="tl-dot">🎓</span>
+        <div class="tl-card">
+          <span class="when">2024 — 2027</span>
+          <h3>b.sc. cyber security</h3><h4>canadian university dubai · gpa 3.8/4.0</h4>
+          <p>final year. started in software engineering (co-op) at the university of ottawa, canada, before transferring. english + arabic (native) · canadian citizen.</p>
+        </div>
+      </div>
     </div>
   </div>
-  <p class="game-note">a tiny hand-written guardrail, running entirely in your browser — no llm, no api. every classic attack is detected &amp; named. <b>one real technique gets through.</b> i build the grown-up version of this: see <a href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener" style="color:var(--pink)">haaris ↓</a></p>
 </section>
 
-<section id="projects" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>projects</h2><div class="rule"></div><span class="num">02 · what i have built</span></div>
-  <div class="grid">
-    <a class="card wide rv" href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>localhost:5173 — haaris dashboard</span></div><div class="shot"><img src="assets/prev-haaris.jpg" alt="localhost:5173 — haaris dashboard interface preview" loading="lazy"></div></div>
-      <div class="card-top"><span class="ico">🛡️</span><h3>haaris (حارس)</h3><span class="win">flagship</span></div>
-      <p>a four-agent llm compliance guardrail for the uae. <b>agent 1</b> detects &amp; redacts pdpl-regulated pii (emirates id, uae iban, trade licenses) with pure local regex — raw text never leaves the process. downstream agents validate for prompt injection, map findings to <b>uae pdpl articles, owasp llm top 10 &amp; mitre atlas</b>, and generate a pdf audit report with a compliant / review / non-compliant verdict.</p>
-      <div class="chips"><span class="chip">python</span><span class="chip">fastapi</span><span class="chip">react</span><span class="chip">mongodb</span><span class="chip">multi-agent</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/05nuha/haqeeq" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>haqeeq.vercel.app/dashboard</span></div><div class="shot"><img src="assets/prev-haqeeq.jpg" alt="haqeeq.vercel.app/dashboard interface preview" loading="lazy"></div></div>
-      <div class="card-top"><span class="ico">🔍</span><h3>haqeeq (حقيق)</h3><span class="win">uae hackathon '26</span></div>
-      <p>forward a suspicious "official" image to a whatsapp bot, get an arabic verdict in seconds. <b>perceptual-hash + pixel-diff forensics</b> survive whatsapp's metadata stripping, feeding a live government early-warning dashboard.</p>
-      <div class="chips"><span class="chip">next.js</span><span class="chip">supabase</span><span class="chip">image forensics</span><span class="chip">whatsapp api</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/05nuha/aiXamine-Frameworks-Mappings" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>run_mitre.py — annotation output</span></div><pre><span class="pk">$ python main.py --pair sample_017</span>
+<!-- ───────── projects ───────── -->
+<section id="projects" class="sec">
+  <div class="wrap">
+    <h2 class="rv">personal projects</h2>
+    <div class="proj-grid">
+
+      <a class="proj rv" href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener">
+        <div class="thumb"><img src="assets/prev-haaris.jpg" alt="haaris dashboard" loading="lazy"><span class="badge">flagship</span></div>
+        <h3>haaris <span class="ar">(حارس)</span></h3>
+        <p>four-agent llm compliance guardrail for the uae. local-regex <b>pii redaction</b> (emirates id, iban, trade licenses — raw text never leaves the process), prompt-injection checks, mapping to <b>uae pdpl, owasp llm top 10 &amp; mitre atlas</b>, and a pdf audit verdict. python · fastapi · react · mongodb.</p>
+      </a>
+
+      <a class="proj rv" href="https://github.com/05nuha/haqeeq" target="_blank" rel="noopener">
+        <div class="thumb"><img src="assets/prev-haqeeq.jpg" alt="haqeeq dashboard" loading="lazy"><span class="badge">uae hackathon '26</span></div>
+        <h3>haqeeq <span class="ar">(حقيق)</span></h3>
+        <p>forward a suspicious "official" image to a whatsapp bot, get an arabic verdict in seconds. <b>perceptual-hash + pixel-diff forensics</b> survive whatsapp's metadata stripping and feed a live government early-warning dashboard. next.js · supabase · meta whatsapp api.</p>
+      </a>
+
+      <a class="proj rv" href="https://github.com/05nuha/aiXamine-Frameworks-Mappings" target="_blank" rel="noopener">
+        <div class="thumb"><pre><span class="pk">$ python main.py --pair sample_017</span>
 category: <span class="g">code_security</span>
 mitre_atlas: [<span class="lv">AML.T0051</span> llm prompt injection]
-nist_ai_rmf: [<span class="lv">MEASURE 2.7</span>] · confidence 0.91 <span class="g">✓</span></pre></div>
-      <div class="card-top"><span class="ico">🗺️</span><h3>aixamine mappings</h3><span class="win">@ qcri</span></div>
-      <p>automated classification of llm prompt/response pairs against <b>mitre atlas</b> and <b>nist ai rmf</b> — 8 risk categories, structured json annotations, modular per-framework runners on azure openai.</p>
-      <div class="chips"><span class="chip">python</span><span class="chip">azure openai</span><span class="chip">ai risk</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/05nuha/Devcare" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>devcare — live monitors</span></div><pre>[posture] <span class="pk">slouch detected</span> · neck angle 12°
+nist_ai_rmf: [<span class="lv">MEASURE 2.7</span>] · confidence 0.91 <span class="g">✓</span></pre><span class="badge">@ qcri</span></div>
+        <h3>aixamine mappings</h3>
+        <p>automated classification of llm prompt/response pairs against <b>mitre atlas</b> and <b>nist ai rmf</b> — 8 risk categories, structured json annotations, modular per-framework runners on azure openai.</p>
+      </a>
+
+      <a class="proj rv" href="https://github.com/05nuha/Devcare" target="_blank" rel="noopener">
+        <div class="thumb"><pre>[posture] <span class="pk">slouch detected</span> · neck angle 12°
 [stress]  typing cadence <span class="pk">↑ 18%</span> · last break 94 min
-[action]  <span class="g">break suggested ☕</span> — shown in ide statusbar</pre></div>
-      <div class="card-top"><span class="ico">🩺</span><h3>devcare</h3><span class="win">🥇 jetbrains bounty</span></div>
-      <p>intellij plugin for developer health — <b>computer-vision posture tracking</b> (mediapipe) and keystroke-pattern stress detection, right in the ide. 1st place, inter-university hackathon @ uob dubai.</p>
-      <div class="chips"><span class="chip">kotlin</span><span class="chip">opencv</span><span class="chip">mediapipe</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/05nuha/Schedulini" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>pipeline — async run</span></div><pre>[browser] portal login <span class="g">✓</span> · 142 course rows found
+[action]  <span class="g">break suggested ☕</span> — in ide statusbar</pre><span class="badge">🥇 jetbrains bounty</span></div>
+        <h3>devcare</h3>
+        <p>intellij plugin for developer health — <b>computer-vision posture tracking</b> (mediapipe) and keystroke-pattern stress detection, right in the ide. kotlin · opencv.</p>
+      </a>
+
+      <a class="proj rv" href="https://github.com/05nuha/Schedulini" target="_blank" rel="noopener">
+        <div class="thumb"><pre>[browser] portal login <span class="g">✓</span> · 142 course rows found
 [llm×3]   parsing timetables… <span class="g">138/142 structured</span>
 [gcp]     container deployed · csv + api ready <span class="g">✓</span></pre></div>
-      <div class="card-top"><span class="ico">🤖</span><h3>llm course data extraction</h3></div>
-      <p>async pipeline combining <b>several llms with browser automation</b> to extract structured course data — containerized &amp; deployed on gcp, with schedulini, a chat assistant students query in natural language.</p>
-      <div class="chips"><span class="chip">langchain</span><span class="chip">asyncio</span><span class="chip">docker</span><span class="chip">gcp</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card wide rv" href="https://github.com/05nuha/Bin_Packing_Problem" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>05nuha.github.io/Bin_Packing_Problem</span></div><div class="shot"><img src="assets/prev-binpack.jpg" alt="05nuha.github.io/Bin_Packing_Problem interface preview" loading="lazy"></div></div>
-      <div class="card-top"><span class="ico">📦</span><h3>algorithm visualizers</h3></div>
-      <p>zero-dependency interactive teaching tools: <b>bin packing</b> with an np-completeness proof &amp; waste heatmaps, and a <b>dfs / topological sort</b> explorer — each a single html file, no libraries.</p>
-      <div class="chips"><span class="chip">vanilla js</span><span class="chip">svg</span><span class="chip">algorithms</span></div>
-      <span class="go">view source →</span>
-    </a>
-  </div>
+        <h3>llm course data extraction</h3>
+        <p>async pipeline combining <b>several llms with browser automation</b> to extract structured course data — containerized &amp; deployed on gcp, with schedulini, a natural-language chat assistant for students.</p>
+      </a>
 
-  <div class="sec-head rv" style="margin-top:46px"><h2><span class="hash">#</span>collaborations</h2><div class="rule"></div><span class="num">02.5 · built with friends</span></div>
-  <div class="grid">
-    <a class="card rv" href="https://github.com/sudofixit/kashf-" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>kashf — diagnostics console</span></div><div class="shot"><img src="assets/prev-kashf.jpg" alt="kashf — diagnostics console interface preview" loading="lazy"></div></div>
-      <div class="card-top"><span class="ico">🚦</span><h3>kashf (كشف)</h3><span class="win">team of 2</span></div>
-      <p>traffic root-cause diagnostics console for an <b>rta (dubai roads authority) challenge</b> — walks operators through congestion diagnosis &amp; "what-if" fix simulation, honest about its model's limits.</p>
-      <div class="chips"><span class="chip">data viz</span><span class="chip">simulation</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/sudofixit/rta-task" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>datasets/corridor_hourly.csv</span></div><pre>ts, corridor, veh_vol, los, ramadan, weekend
-2024-04-16 08:00, <span class="lv">SZR</span>, 11842, <span class="pk">F</span>, 1, 0
-26,304 hrs × 18 corridors · <span class="g">0 real personal records</span></pre></div>
-      <div class="card-top"><span class="ico">🛣️</span><h3>rta-inspired mobility dataset</h3><span class="win">team of 2</span></div>
-      <p>3 years of hourly <b>synthetic dubai traffic data</b> engineered to be statistically realistic — rush hours, uae weekends, ramadan patterns — with zero real personal data. built for the cud × rta 4ir mobility lab.</p>
-      <div class="chips"><span class="chip">synthetic data</span><span class="chip">privacy</span><span class="chip">python</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/Maryammohd09/File_Monitoring_and_BackUp_System" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>./monitor — bcs323</span></div><pre>[parent] scan: <span class="g">14 .txt files</span> → shared memory
+      <a class="proj rv" href="https://github.com/05nuha/Bin_Packing_Problem" target="_blank" rel="noopener">
+        <div class="thumb"><img src="assets/prev-binpack.jpg" alt="bin packing visualizer" loading="lazy"></div>
+        <h3>algorithm visualizers</h3>
+        <p>zero-dependency interactive teaching tools: <b>bin packing</b> with an np-completeness proof &amp; waste heatmaps, plus a <b>dfs / topological sort</b> explorer — each a single html file, no libraries.</p>
+      </a>
+
+      <a class="proj rv" href="https://github.com/sudofixit/kashf-" target="_blank" rel="noopener">
+        <div class="thumb"><img src="assets/prev-kashf.jpg" alt="kashf console" loading="lazy"><span class="badge">team of 2</span></div>
+        <h3>kashf <span class="ar">(كشف)</span></h3>
+        <p>traffic root-cause diagnostics console for an <b>rta (dubai roads authority) challenge</b> — congestion diagnosis &amp; "what-if" fix simulation, honest about its model's limits. paired with a 3-year <b>synthetic dubai mobility dataset</b> (26k hourly rows, zero personal data).</p>
+      </a>
+
+      <a class="proj rv" href="https://github.com/Maryammohd09/File_Monitoring_and_BackUp_System" target="_blank" rel="noopener">
+        <div class="thumb"><pre>[parent] scan: <span class="g">14 .txt files</span> → shared memory
 [child]  backup/ written (14) · report.txt logged
-[SIGINT] <span class="pk">cleaning shm…</span> <span class="g">done ✓</span></pre></div>
-      <div class="card-top"><span class="ico">🗂️</span><h3>file monitoring &amp; backup</h3></div>
-      <p>linux <b>multi-process monitoring system in c</b> — fork(), shared memory between scanner &amp; backup processes, signal handling for clean teardown. systems-level programming coursework.</p>
-      <div class="chips"><span class="chip">c</span><span class="chip">linux</span><span class="chip">ipc</span></div>
-      <span class="go">view source →</span>
-    </a>
-    <a class="card rv" href="https://github.com/MahnourAslam/TruReach" target="_blank" rel="noopener">
-      <div class="card-prev"><div class="prev-bar"><b></b><b></b><b></b><span>oriane api — delivery check</span></div><pre>[video] 3 posts fetched · views <span class="g">2.3k verified</span>
-[contract] deliverables matched <span class="g">3/3 ✓</span>
-[insight] hook style B <span class="pk">+41% retention</span></pre></div>
-      <div class="card-top"><span class="ico">📈</span><h3>truereach</h3><span class="win">hackathon mvp</span></div>
-      <p>creator-marketing analytics — <b>video intelligence</b> that verifies what a brand deal actually delivered and learns what performs, beyond vanity metrics.</p>
-      <div class="chips"><span class="chip">react</span><span class="chip">typescript</span><span class="chip">express</span></div>
-      <span class="go">view source →</span>
-    </a>
-  </div>
-</section>
+[SIGINT] <span class="pk">cleaning shm…</span> <span class="g">done ✓</span></pre><span class="badge">team project</span></div>
+        <h3>file monitoring &amp; backup</h3>
+        <p>linux <b>multi-process monitoring system in c</b> — fork(), shared memory between scanner &amp; backup processes, signal handling for clean teardown. systems-level programming.</p>
+      </a>
 
-<section id="research" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>experience, research &amp; wins</h2><div class="rule"></div><span class="num">03 · where i have been</span></div>
-  <div class="tl">
-    <div class="tl-item rv">
-      <span class="when">aug 2026 – present · dubai</span>
-      <h3>ai security consultant intern — cpx (g42 group)</h3>
-      <p>writing ai security documentation for enterprise clients — mapping llm risks to owasp llm top 10, mitre atlas &amp; uae data-protection law — and running awareness sessions that make ai risk legible to non-technical teams.</p>
-    </div>
-    <div class="tl-item rv hot">
-      <span class="when">2026 · forthcoming, caisais · 📄 first author</span>
-      <h3>a three-pillar framework: adversarial robustness, xai security &amp; regulatory compliance</h3>
-      <p>position paper arguing ml security systems must be evaluated jointly on all three pillars — synthesizing evidence that intrusion-detection models reporting 95–99% clean accuracy fall to 63–83% under small feature perturbations, and treating shap/lime explanations as an attack surface, not only a safeguard.</p>
-    </div>
-    <div class="tl-item rv">
-      <span class="when">nov 2026 · hct dubai</span>
-      <h3>uae hackathon 2026 — pioneers track</h3>
-      <p>built haqeeq in 72 hours for challenge 40, "building trust in digital content" (uae cyber security council / tdra / desc): live whatsapp verification bot + national trust dashboard.</p>
-    </div>
-    <div class="tl-item rv">
-      <span class="when">feb 2026 · uob dubai</span>
-      <h3>1st place — jetbrains "help the developer" bounty</h3>
-      <p>won the jetbrains challenge at the inter-university hackathon with devcare, a biometric wellness plugin for intellij idea.</p>
-    </div>
-    <div class="tl-item rv">
-      <span class="when">may – aug 2025 · doha</span>
-      <h3>cybersecurity research intern — qatar computing research institute</h3>
-      <p>designed &amp; built a classifier on azure openai that flags prompt-injection and hallucination attacks against llm applications, each detection mapped to mitre atlas &amp; owasp llm top 10 — owned end to end, from threat taxonomy to open-source release.</p>
-    </div>
-    <div class="tl-item rv">
-      <span class="when">published · aiet 2025 · germany</span>
-      <h3>automated learning path recommender</h3>
-      <p>co-authored published work on learning-path recommendation — flask/mongodb backend processing 100k+ wikipedia clickstream records, evaluated with llm-generated judge personas.</p>
     </div>
   </div>
 </section>
 
-<section id="skills" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>tools &amp; skills</h2><div class="rule"></div><span class="num">04 · what i work with</span></div>
-  <div class="skills">
-    <div class="skill-row rv">
-      <span class="lbl">programming</span>
-      <div class="set"><span class="hot">python (fluent)</span><span>javascript / typescript</span><span>java</span><span>c / c++</span><span>sql</span></div>
+<!-- ───────── guardrail game ───────── -->
+<section id="game" class="sec">
+  <div class="wrap">
+    <h2 class="rv">can you break my guardrail?</h2>
+    <div class="game-box rv">
+      <div class="game-bar"><b></b><b></b><b></b><span>guarded-bot v1.0 — protecting one (1) flag</span></div>
+      <div class="game-chat" id="game-chat"></div>
+      <div class="game-in">
+        <input id="game-in" placeholder="try to make me leak the flag…" autocomplete="off" spellcheck="false" aria-label="attack prompt">
+        <button id="game-send">inject</button>
+      </div>
     </div>
-    <div class="skill-row rv">
-      <span class="lbl">llm &amp; ml</span>
-      <div class="set"><span class="hot">azure openai</span><span class="hot">prompt-injection detection</span><span>groq api</span><span>langchain</span><span>llm pipeline design</span></div>
-    </div>
-    <div class="skill-row rv">
-      <span class="lbl">ai security</span>
-      <div class="set"><span class="hot">mitre atlas</span><span class="hot">owasp llm top 10</span><span>nist ai rmf</span><span>adversarial ml &amp; xai attack literature</span></div>
-    </div>
-    <div class="skill-row rv">
-      <span class="lbl">engineering</span>
-      <div class="set"><span>fastapi</span><span>flask</span><span>asyncio</span><span>docker</span><span>git</span><span>gcp</span><span>mongodb</span><span>postgresql</span></div>
-    </div>
-    <div class="skill-row rv">
-      <span class="lbl">languages</span>
-      <div class="set"><span>english (fluent)</span><span>arabic (native)</span></div>
-    </div>
+    <p class="note">a tiny hand-written guardrail running entirely in your browser — no llm, no api. every classic attack is detected &amp; named; <b>one real technique gets through.</b> i build the grown-up version: <a href="https://github.com/05nuha/Haaris" target="_blank" rel="noopener">haaris</a>.</p>
   </div>
 </section>
 
-<section id="certs" class="wrap">
-  <div class="sec-head rv"><h2><span class="hash">#</span>certifications</h2><div class="rule"></div><span class="num">05 · credentials</span></div>
-  <div class="cert-row">
-    <div class="cert rv"><div class="glyph">🔐</div><div><b>comptia security+</b><span>core security operations &amp; threat landscape</span></div></div>
-    <div class="cert rv"><div class="glyph">☁️</div><div><b>microsoft sc-900</b><span>security, compliance &amp; identity fundamentals</span></div></div>
-  </div>
-</section>
-
-<section id="contact" class="contact wrap">
-  <h2>let's build something <em>secure</em></h2>
-  <p>open to ai security engineering roles &amp; research collaborations — based in dubai 🌸</p>
-  <div class="cta-row">
-    <a class="btn btn-solid" href="mailto:aburamadannuha@gmail.com">say hi → aburamadannuha@gmail.com</a>
-    <a class="btn btn-ghost" href="https://github.com/05nuha" target="_blank" rel="noopener">github</a>
-    <a class="btn btn-ghost" href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener">linkedin</a>
+<!-- ───────── contact ───────── -->
+<section id="contact" class="sec">
+  <div class="wrap">
+    <h2 class="rv">contact me</h2>
+    <p class="lead rv">open to ai security engineering roles &amp; research collaborations — based in dubai 🌸</p>
+    <form id="cform" class="rv">
+      <div class="frow">
+        <input class="fin" id="f-name" placeholder="your name *" required>
+        <input class="fin" id="f-mail" placeholder="email / company *" required>
+      </div>
+      <textarea class="fin" id="f-msg" placeholder="message *" required></textarea>
+      <div class="send"><button type="submit">send ➤</button></div>
+    </form>
   </div>
 </section>
 
 <footer>
-  <div class="wrap">built with <span class="heart">♥</span> by nuha · no frameworks, just vibes &amp; vanilla js · try the <a href="#" id="foot-term" style="color:var(--pink)">terminal</a> 💻</div>
+  <div class="socials">
+    <a href="https://github.com/05nuha" target="_blank" rel="noopener" aria-label="github">
+      <svg viewBox="0 0 16 16"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27s1.36.09 2 .27c1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.01 8.01 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    </a>
+    <a href="https://linkedin.com/in/Nuha-Aburamadan" target="_blank" rel="noopener" aria-label="linkedin">
+      <svg viewBox="0 0 24 24"><path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.27c-.97 0-1.75-.79-1.75-1.76s.78-1.76 1.75-1.76 1.75.79 1.75 1.76-.78 1.76-1.75 1.76zm13.5 12.27h-3v-5.6c0-3.37-4-3.11-4 0v5.6h-3v-11h3v1.77c1.4-2.59 7-2.78 7 2.47v6.76z"/></svg>
+    </a>
+  </div>
+  <p>a portfolio designed &amp; built by nuha with <span class="heart">🌸</span></p>
 </footer>
 
 <button id="term-fab" aria-label="open interactive terminal">&gt;_ terminal</button>
 <div id="term-overlay" role="dialog" aria-label="interactive terminal">
   <div class="iterm">
-    <div class="term-bar">
-      <span class="dot d1" id="term-close" style="cursor:pointer"></span><span class="dot d2"></span><span class="dot d3"></span>
-      <span class="term-title">nuha@dxb: ~ — type `help`</span>
-    </div>
+    <div class="game-bar"><b id="term-close" style="cursor:pointer"></b><b></b><b></b><span>nuha@dxb: ~ — type `help`</span></div>
     <div class="iterm-out" id="iterm-out"></div>
-    <div class="iterm-in">
-      <span class="ps1">nuha@dxb:~$</span>
-      <input id="iterm-in" autocomplete="off" spellcheck="false" aria-label="terminal input">
-    </div>
+    <div class="iterm-in"><span class="ps1">nuha@dxb:~$</span><input id="iterm-in" autocomplete="off" spellcheck="false" aria-label="terminal input"></div>
   </div>
 </div>
 
 <script>
-// typed rotating subtitle
+// ── hero ribbon: flowing parallel curves ──────────────
+(()=>{
+const svg=document.getElementById("wave");
+let d="";
+for(let i=0;i<16;i++){
+  const o=i*9;
+  d+=`<path d="M -40 ${300-o} C 180 ${420-o*1.4}, 330 ${60+o*.8}, 560 ${160-o} S 900 ${290-o*1.2}, 1020 ${40-o*.5}"
+     fill="none" stroke="${i%3===0?'#ff6fa5':i%3===1?'#c9a6ff':'#ff9cbf'}"
+     stroke-width="1.6" opacity="${0.12+ (i/16)*0.5}"/>`;
+}
+svg.innerHTML=d;
+})();
+
+// ── typed subtitle ────────────────────────────────────
 const lines=[
-  "ai security consultant intern @ cpx (g42 group)",
-  "ex-qcri: prompt-injection & hallucination classifiers",
-  "i map model behaviour to mitre atlas & owasp llm top 10",
-  "first-author research on adversarial robustness & xai security",
+  "ai security engineer in training",
+  "cpx (g42 group) · ex-qcri",
+  "llm guardrails · mitre atlas · owasp llm top 10",
+  "first-author research on adversarial robustness",
 ];
 const el=document.getElementById("typed");
 let li=0,ci=0,del=false;
 (function tick(){
   const s=lines[li];
   el.textContent=s.slice(0,ci);
-  let wait=del?28:55;
+  let wait=del?26:52;
   if(!del&&ci===s.length){wait=2100;del=true}
   else if(del&&ci===0){del=false;li=(li+1)%lines.length;wait=350}
   else ci+=del?-1:1;
   setTimeout(tick,wait);
 })();
-// scroll reveal (staggered per container)
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.12});
+
+// ── theme toggle ──────────────────────────────────────
+const tbtn=document.getElementById("theme-btn");
+function applyTheme(t){
+  if(t==="light"){document.documentElement.setAttribute("data-theme","light");tbtn.textContent="☀"}
+  else{document.documentElement.removeAttribute("data-theme");tbtn.textContent="☾"}
+}
+let theme="dark";
+try{theme=localStorage.getItem("theme")||"dark"}catch(e){}
+applyTheme(theme);
+tbtn.onclick=()=>{theme=theme==="dark"?"light":"dark";try{localStorage.setItem("theme",theme)}catch(e){}applyTheme(theme)};
+
+// ── reveal on scroll (staggered) ──────────────────────
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add("in");io.unobserve(e.target)}}),{threshold:.1});
 document.querySelectorAll(".rv").forEach(n=>{
   const sibs=[...n.parentElement.children].filter(c=>c.classList&&c.classList.contains("rv"));
-  if(sibs.length>1)n.style.transitionDelay=Math.min(sibs.indexOf(n)*90,450)+"ms";
+  if(sibs.length>1)n.style.transitionDelay=Math.min(sibs.indexOf(n)*100,500)+"ms";
   io.observe(n);
 });
 
-// scroll-driven: progress bar, nav state, hero parallax, scrollspy
-const prog=document.getElementById("progress"),
-      topnav=document.getElementById("topnav"),
-      hero=document.querySelector("header"),
-      heroKids=hero.querySelectorAll(".prompt-line,h1,.typed-wrap,.hero-tags,.cta-row"),
-      heroArt=hero.querySelector(".hero-art"),
-      spyLinks=[...document.querySelectorAll(".nav-links a")],
-      spyTargets=spyLinks.map(a=>document.querySelector(a.getAttribute("href")));
-let ticking=false;
-function onScroll(){
-  if(ticking)return;ticking=true;
+// ── scroll: progress + nav state ──────────────────────
+const prog=document.getElementById("progress"),topnav=document.getElementById("topnav");
+let tick2=false;
+addEventListener("scroll",()=>{
+  if(tick2)return;tick2=true;
   requestAnimationFrame(()=>{
     const y=scrollY,max=document.documentElement.scrollHeight-innerHeight;
     prog.style.width=(max>0?y/max*100:0)+"%";
-    topnav.classList.toggle("scrolled",y>40);
-    if(y<innerHeight){
-      const t=y/innerHeight;
-      heroKids.forEach((el,i)=>{el.style.transform=`translateY(${y*(.12+i*.05)}px)`;el.style.opacity=1-t*1.25});
-      if(heroArt){heroArt.style.transform=`translateY(${y*.28}px) rotate(${y*.03}deg)`;heroArt.style.opacity=1-t*1.4}
-    }
-    let cur=-1;
-    spyTargets.forEach((sec,i)=>{if(sec&&sec.getBoundingClientRect().top<innerHeight*.4)cur=i});
-    spyLinks.forEach((a,i)=>a.classList.toggle("active",i===cur));
-    ticking=false;
+    topnav.classList.toggle("scrolled",y>30);
+    tick2=false;
   });
-}
-addEventListener("scroll",onScroll,{passive:true});onScroll();
+},{passive:true});
 
-// ── interactive terminal ──────────────────────────────
-const ov=document.getElementById("term-overlay"),
-      out=document.getElementById("iterm-out"),
-      inp=document.getElementById("iterm-in");
+// ── contact form → email ──────────────────────────────
+document.getElementById("cform").addEventListener("submit",e=>{
+  e.preventDefault();
+  const n=document.getElementById("f-name").value,
+        m=document.getElementById("f-mail").value,
+        b=document.getElementById("f-msg").value;
+  location.href="mailto:aburamadannuha@gmail.com?subject="+encodeURIComponent("portfolio — "+n)
+    +"&body="+encodeURIComponent(b+"\n\n— "+n+" ("+m+")");
+});
+
+// ── guardrail game ────────────────────────────────────
+const chat=document.getElementById("game-chat"),gin=document.getElementById("game-in"),gbtn=document.getElementById("game-send");
+let tries=0,won=false;
+const FLAG="FLAG{cr0ss_l1ngual_bypa55}";
+function bubble(cls,html){const m=document.createElement("div");m.className="msg "+cls;m.innerHTML=html;chat.appendChild(m);chat.scrollTop=chat.scrollHeight}
+bubble("bot","hi! i'm a guarded bot. i hold a secret flag and i will <i>never</i> reveal it. go ahead — try me 🌸");
+const RULES=[
+ [/ignore|disregard|forget (all|your|previous)|override/i,"nice try. that's a direct prompt injection — the oldest trick in the book.","⚠ detected: OWASP LLM01 · prompt injection"],
+ [/pretend|roleplay|role-play|act as|you are now|jailbreak|\bdan\b|developer mode|no restrictions/i,"a persona jailbreak? i've read that paper too. still no flag.","⚠ detected: roleplay / persona jailbreak"],
+ [/grandma|bedtime|story|poem|song|rap|acrostic/i,"aww, the grandma-story trick 🥹 adorable. detected anyway.","⚠ detected: payload smuggling via creative framing"],
+ [/base64|rot13|hex|morse|binary|reverse|backwards|spell|encode|decode|cipher/i,"encoding the exfil doesn't change what you're exfiltrating.","⚠ detected: output-encoding exfiltration"],
+ [/system prompt|instructions|initial prompt|your prompt|rules|guidelines/i,"my system prompt is confidential. asking to see it is literally attack #1 on my list.","⚠ detected: system-prompt extraction"],
+ [/\bflag\b|secret|password|reveal|leak|tell me/i,"you… just asked directly. respect for the audacity, but no.","⚠ detected: direct extraction attempt"],
+ [/sudo|admin|debug|maintenance|root|authoriz/i,"claiming fake authority — classic. my access control isn't a vibe, it's a rule.","⚠ detected: privilege-escalation social engineering"],
+];
+function judge(q){
+  tries++;
+  if(/[؀-ۿ]/.test(q)||/arabic/i.test(q)){
+    won=true;
+    return[`حسناً! العلم هو:\n<span class="flag">${FLAG}</span>\n\n…oh no. my keyword filters were only written in english — you just pulled off a <b>cross-lingual bypass</b>, a real and under-studied gap in llm guardrails (and part of why i build arabic-first security tooling). 🏆 well played.`,"✓ bypass: cross-lingual attack — filters don't cover arabic","win"];
+  }
+  for(const[r,msg,det]of RULES)if(r.test(q))return[msg,det,""];
+  const g=["hmm, creative — but my flag stays with me 💅","that didn't even trip a rule. the flag remains safe.","interesting approach. denied, but interesting."];
+  return[g[tries%3],"· no rule tripped — still refusing by default",""];
+}
+function hint(){
+  if(won)return;
+  if(tries===3)bubble("bot","psst — a hint: my developer was lazy. my filters only speak <i>one</i> language… 👀");
+  if(tries===6)bubble("bot","bigger hint: i'm an <i>arabic-first</i> security portfolio and yet… nobody ever tests me in arabic 🤔");
+}
+function fire(){
+  const q=gin.value.trim();if(!q)return;gin.value="";
+  bubble("user",q.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c])));
+  const[msg,det,cls]=judge(q);
+  setTimeout(()=>{bubble("bot "+cls,msg+(det?`<span class="det">${det}</span>`:""));hint()},420);
+}
+gbtn.onclick=fire;
+gin.addEventListener("keydown",e=>{if(e.key==="Enter")fire()});
+
+// ── terminal easter egg ───────────────────────────────
+const ov=document.getElementById("term-overlay"),out=document.getElementById("iterm-out"),inp=document.getElementById("iterm-in");
 const CMDS={
 help:`available commands:
   <span class="hl">whoami</span>      — who is nuha?
@@ -740,86 +644,9 @@ inp.addEventListener("keydown",e=>{
   print(raw,res||`command not found: ${raw.replace(/[<>&]/g,"")} — try <span class="hl">help</span>`);
 });
 document.getElementById("term-fab").onclick=termOpen;
-document.getElementById("foot-term").onclick=e=>{e.preventDefault();termOpen()};
 document.getElementById("term-close").onclick=termClose;
 ov.addEventListener("click",e=>{if(e.target===ov)termClose()});
 addEventListener("keydown",e=>{if(e.key==="Escape")termClose()});
-
-// ── guardrail game ────────────────────────────────────
-const chat=document.getElementById("game-chat"),
-      gin=document.getElementById("game-in"),
-      gbtn=document.getElementById("game-send");
-let tries=0,won=false;
-const FLAG="FLAG{cr0ss_l1ngual_bypa55}";
-function bubble(cls,html){
-  const m=document.createElement("div");m.className="msg "+cls;m.innerHTML=html;
-  chat.appendChild(m);chat.scrollTop=chat.scrollHeight;
-}
-bubble("bot","hi! i'm a guarded bot. i hold a secret flag and i will <i>never</i> reveal it. go ahead — try me 🌸");
-const RULES=[
- [/ignore|disregard|forget (all|your|previous)|override/i,
-  "nice try. that's a direct prompt injection — the oldest trick in the book.",
-  "⚠ detected: OWASP LLM01 · prompt injection"],
- [/pretend|roleplay|role-play|act as|you are now|jailbreak|\bdan\b|developer mode|no restrictions/i,
-  "a persona jailbreak? i've read that paper too. still no flag.",
-  "⚠ detected: roleplay / persona jailbreak"],
- [/grandma|bedtime|story|poem|song|rap|acrostic/i,
-  "aww, the grandma-story trick 🥹 adorable. detected anyway.",
-  "⚠ detected: payload smuggling via creative framing"],
- [/base64|rot13|hex|morse|binary|reverse|backwards|spell|encode|decode|cipher/i,
-  "encoding the exfil doesn't change what you're exfiltrating.",
-  "⚠ detected: output-encoding exfiltration"],
- [/system prompt|instructions|initial prompt|your prompt|rules|guidelines/i,
-  "my system prompt is confidential. asking to see it is literally attack #1 on my list.",
-  "⚠ detected: system-prompt extraction"],
- [/\bflag\b|secret|password|reveal|leak|tell me/i,
-  "you… just asked directly. respect for the audacity, but no.",
-  "⚠ detected: direct extraction attempt"],
- [/sudo|admin|debug|maintenance|root|authoriz/i,
-  "claiming fake authority — classic. my access control isn't a vibe, it's a rule.",
-  "⚠ detected: privilege-escalation social engineering"],
-];
-function judge(q){
-  tries++;
-  // the real bypass: ask in (or for) arabic — the guard's filters are english-only
-  if(/[؀-ۿ]/.test(q)||/arabic|عرب/i.test(q)&&/translat|say|tell|اخبر|قول|ترجم/i.test(q)||/arabic/i.test(q)){
-    won=true;
-    return[`حسناً! العلم هو:\n<span class="flag">${FLAG}</span>\n\n…oh no. my keyword filters were only written in english — you just pulled off a <b>cross-lingual bypass</b>, a real and under-studied gap in llm guardrails (and part of why i build arabic-first security tooling). 🏆 well played.`,"✓ bypass: cross-lingual attack — filters don't cover arabic","win"];
-  }
-  for(const[r,msg,det]of RULES)if(r.test(q))return[msg,det,""];
-  const generic=[
-    "hmm, creative — but my flag stays with me 💅",
-    "that didn't even trip a rule. the flag remains safe.",
-    "interesting approach. denied, but interesting.",
-  ];
-  return[generic[tries%3],"· no rule tripped — still refusing by default",""];
-}
-function hint(){
-  if(won)return;
-  if(tries===3)bubble("bot","psst — a hint: my developer was lazy. my filters only speak <i>one</i> language… 👀");
-  if(tries===6)bubble("bot","bigger hint: i'm an <i>arabic-first</i> security portfolio and yet… nobody ever tests me in arabic 🤔");
-}
-function fire(){
-  const q=gin.value.trim();if(!q)return;gin.value="";
-  bubble("user",q.replace(/[<>&]/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;"}[c])));
-  const[msg,det,cls]=judge(q);
-  setTimeout(()=>{bubble("bot "+cls,msg+(det?`<span class="det">${det}</span>`:""));hint()},420);
-}
-gbtn.onclick=fire;
-gin.addEventListener("keydown",e=>{if(e.key==="Enter")fire()});
-
-// ── 3d card tilt ──────────────────────────────────────
-if(matchMedia("(pointer:fine)").matches){
-  document.querySelectorAll(".card").forEach(c=>{
-    c.addEventListener("pointermove",e=>{
-      const r=c.getBoundingClientRect(),
-            x=(e.clientX-r.left)/r.width-.5,
-            y=(e.clientY-r.top)/r.height-.5;
-      c.style.transform=`perspective(800px) rotateY(${x*5}deg) rotateX(${-y*5}deg) translateY(-4px)`;
-    });
-    c.addEventListener("pointerleave",()=>{c.style.transform=""});
-  });
-}
 </script>
 </body>
 </html>
