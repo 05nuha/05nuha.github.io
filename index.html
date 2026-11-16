@@ -91,6 +91,20 @@ nav.scrolled{background:rgba(11,7,16,.82);backdrop-filter:blur(12px);box-shadow:
 @keyframes cue{0%{opacity:1;transform:translateY(0)}70%{opacity:0;transform:translateY(15px)}100%{opacity:0}}
 @media (max-width:768px){.hero{display:block;padding:130px 7% 70px;min-height:0}.avatar{margin-bottom:20px}}
 
+/* animated cat avatar */
+.cat-eyes{transform-origin:50px 53px;animation:catblink 4.6s infinite}
+@keyframes catblink{0%,91%,100%{transform:scaleY(1)}94%,96%{transform:scaleY(.08)}}
+.cat-ear{transform-box:fill-box;animation:eartw 5.5s infinite}
+.cat-ear.l{transform-origin:70% 100%}
+.cat-ear.r{transform-origin:30% 100%;animation-delay:.25s}
+@keyframes eartw{0%,84%,100%{transform:rotate(0)}87%{transform:rotate(-9deg)}90%{transform:rotate(5deg)}93%{transform:rotate(0)}}
+.cat-ear.r{animation-name:eartwr}
+@keyframes eartwr{0%,84%,100%{transform:rotate(0)}87%{transform:rotate(9deg)}90%{transform:rotate(-5deg)}93%{transform:rotate(0)}}
+#cat svg{animation:catbob 4s ease-in-out infinite}
+@keyframes catbob{0%,100%{transform:translateY(2px)}50%{transform:translateY(-2px)}}
+#pupils{transition:transform .12s ease-out}
+@media (prefers-reduced-motion:reduce){.cat-eyes,.cat-ear,#cat svg{animation:none}}
+
 /* ── section headers: KICKER + Huge Title. ── */
 .sec{padding:110px 0}
 .wrap{max-width:1200px;margin:0 auto;padding:0 6%}
@@ -300,7 +314,28 @@ footer .heart{color:var(--accent)}
 
 <!-- ── hero / overview (kept) ── -->
 <header class="hero" id="top">
-  <div class="fade-seq"><div class="avatar">ن</div></div>
+  <div class="fade-seq"><div class="avatar" id="cat" aria-label="animated cat avatar">
+    <svg viewBox="0 0 100 100" width="118" height="118" aria-hidden="true">
+      <g class="cat-ear l"><path d="M22 40 L26 12 L46 30 Z" fill="#1a1426"/><path d="M28 34 L29 20 L39 30 Z" fill="#ff8fb8"/></g>
+      <g class="cat-ear r"><path d="M78 40 L74 12 L54 30 Z" fill="#1a1426"/><path d="M72 34 L71 20 L61 30 Z" fill="#ff8fb8"/></g>
+      <ellipse cx="50" cy="56" rx="33" ry="29" fill="#1a1426"/>
+      <g class="cat-eyes">
+        <ellipse cx="37" cy="53" rx="8" ry="9" fill="#fff"/>
+        <ellipse cx="63" cy="53" rx="8" ry="9" fill="#fff"/>
+        <g id="pupils">
+          <ellipse cx="37" cy="53" rx="3.6" ry="6" fill="#1a1426"/>
+          <ellipse cx="63" cy="53" rx="3.6" ry="6" fill="#1a1426"/>
+          <circle cx="38.6" cy="50.4" r="1.3" fill="#fff"/>
+          <circle cx="64.6" cy="50.4" r="1.3" fill="#fff"/>
+        </g>
+      </g>
+      <path d="M47 63 L53 63 L50 66.5 Z" fill="#ff8fb8"/>
+      <path d="M50 66.5 Q46 71 42.5 68 M50 66.5 Q54 71 57.5 68" fill="none" stroke="#ff8fb8" stroke-width="1.6" stroke-linecap="round"/>
+      <g stroke="#c9a6ff" stroke-width="1.1" stroke-linecap="round" opacity=".85">
+        <path d="M30 64 L13 61 M30 67 L13 69"/><path d="M70 64 L87 61 M70 67 L87 69"/>
+      </g>
+    </svg>
+  </div></div>
   <div class="hero-content fade-seq">
     <div class="socials">
       <a href="https://github.com/05nuha" target="_blank" rel="noopener" aria-label="github"><svg class="icon"><use href="#i-gh"/></svg></a>
@@ -691,6 +726,18 @@ for(let i=0;i<18;i++){
 }
 const svg=`<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 3000 1500' preserveAspectRatio='xMidYMid slice'><rect width='3000' height='1500' fill='%230a0712'/><g>${paths}</g></svg>`;
 document.querySelector(".hero").style.backgroundImage=`url("data:image/svg+xml,${svg}")`;
+})();
+
+// ── cat eyes follow the cursor ──
+(()=>{
+const cat=document.getElementById("cat"),pup=document.getElementById("pupils");
+if(!cat||!pup)return;
+addEventListener("pointermove",e=>{
+  const r=cat.getBoundingClientRect(),
+        dx=e.clientX-(r.left+r.width/2), dy=e.clientY-(r.top+r.height/2),
+        d=Math.hypot(dx,dy)||1, k=Math.min(d/140,1);
+  pup.style.transform=`translate(${dx/d*3.4*k}px,${dy/d*2.6*k}px)`;
+},{passive:true});
 })();
 
 // ── typed subtitle ──
